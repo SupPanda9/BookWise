@@ -1,0 +1,7 @@
+requests
+transformers
+keybert
+sentence-transformers
+python-dotenv
+scikit-learn
+spacy
