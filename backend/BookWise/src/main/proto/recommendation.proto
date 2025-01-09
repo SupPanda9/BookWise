@@ -1,0 +1,29 @@
+syntax = "proto3";  // Версия на Protobuf
+
+package bookwise;  // Пакет за организиране на услугата
+
+// Дефиниция на съобщението за входяща заявка
+message RecommendationRequest {
+  string query = 1;               // Заявка от потребителя (пример: "Books about dragons")
+  repeated string genres = 2;     // Списък с жанрове (пример: ["Fantasy", "Adventure"])
+  repeated string readBooks = 3;  // Списък с вече прочетени книги
+}
+
+// Дефиниция на съобщението за книга
+message Book {
+  string title = 1;               // Заглавие на книгата
+  repeated string authors = 2;    // Списък с автори
+  double similarity = 3;          // Сходство с заявката (0.0 - 1.0)
+  string description = 4;         // Кратко описание
+}
+
+// Дефиниция на съобщението за отговор
+message RecommendationResponse {
+  repeated Book books = 1;  // Списък с препоръчани книги
+}
+
+// Дефиниция на услугата за препоръки
+service RecommendationService {
+  // Дефинира RPC метод за извличане на препоръки
+  rpc GetRecommendations (RecommendationRequest) returns (RecommendationResponse);
+}
