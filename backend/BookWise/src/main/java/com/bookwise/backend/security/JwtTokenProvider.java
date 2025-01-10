@@ -1,6 +1,7 @@
 package com.bookwise.backend.security;
 
 import com.bookwise.backend.model.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -27,12 +28,15 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         try {
+            System.out.println("Validating token: " + token);
             Jwts.parserBuilder()
-                .setSigningKey(jwtSecretKey)
+                .setSigningKey(jwtSecretKey) // Ensure this matches the signing key
                 .build()
-                .parseClaimsJws(token);
+                .parseClaimsJws(token); // Parse and validate the token
+            System.out.println("Token is valid!");
             return true;
         } catch (Exception e) {
+            System.out.println("Token validation failed: " + e.getMessage());
             return false;
         }
     }
@@ -45,4 +49,13 @@ public class JwtTokenProvider {
             .getBody()
             .getSubject();
     }
+
+    public Claims getClaimsFromToken(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(jwtSecretKey)
+            .build()
+            .parseClaimsJws(token)
+            .getBody();
+    }
+
 }
