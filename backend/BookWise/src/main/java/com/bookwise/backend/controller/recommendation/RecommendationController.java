@@ -1,4 +1,4 @@
-package com.bookwise.backend.controller;
+package com.bookwise.backend.controller.recommendation;
 
 import com.bookwise.backend.messaging.RabbitMQProducer;
 import com.bookwise.backend.messaging.RabbitMQConsumer;
@@ -14,7 +14,7 @@ import java.util.Map;
 @RequestMapping("/recommendations")
 public class RecommendationController {
 
-    private final RabbitMQProducer producer; 
+    private final RabbitMQProducer producer;
     private final RabbitMQConsumer consumer;
 
     public RecommendationController(RabbitMQProducer producer, RabbitMQConsumer consumer) {
