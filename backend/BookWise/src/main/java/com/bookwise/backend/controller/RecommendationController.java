@@ -14,7 +14,7 @@ import java.util.Map;
 @RequestMapping("/recommendations")
 public class RecommendationController {
 
-    private final RabbitMQProducer producer;
+    private final RabbitMQProducer producer; 
     private final RabbitMQConsumer consumer;
 
     public RecommendationController(RabbitMQProducer producer, RabbitMQConsumer consumer) {
