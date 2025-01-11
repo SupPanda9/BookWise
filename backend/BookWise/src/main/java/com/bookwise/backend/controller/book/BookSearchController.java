@@ -1,6 +1,6 @@
 package com.bookwise.backend.controller.book;
 
-import com.bookwise.backend.service.BookService;
+import com.bookwise.backend.service.BookSearchService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,23 +9,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/books")
-public class BookController {
+@RequestMapping("/externalBooks")
+public class BookSearchController {
 
-    private final BookService bookService;
+    private final BookSearchService bookSearchService;
 
-    public BookController(BookService bookService) {
-        this.bookService = bookService;
+    public BookSearchController(BookSearchService bookSearchService) {
+        this.bookSearchService = bookSearchService;
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> searchCachedBooks(
+    public ResponseEntity<?> searchBooks(
         @RequestParam String query,
         @RequestParam(defaultValue = "10") int maxResults,
         @RequestParam(defaultValue = "0") int startIndex
     ) {
         try {
-            return ResponseEntity.ok("Cached book search not implemented yet.");
+            return ResponseEntity.ok(bookSearchService.searchBooks(query, maxResults, startIndex));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
