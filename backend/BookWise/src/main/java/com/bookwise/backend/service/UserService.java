@@ -218,7 +218,7 @@ public class UserService {
         // Save the updated collection
         db.collection("collections").document(readCollection.getId()).set(readCollection).get();
     }
-    
+
     private void saveUser(String userId, User user, Firestore db) throws Exception {
         db.collection("users").document(userId).set(user).get();
     }
