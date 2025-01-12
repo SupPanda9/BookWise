@@ -4,6 +4,8 @@ import HomePage from "./pages/HomePage";
 import RegistrationPage from "./pages/RegistrationPage";
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
+import SearchPage from "./pages/SearchPage";
+import BookDetailsPage from "./pages/BookDetailsPage";
 
 function App() {
     return (
@@ -14,10 +16,11 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 {/* Placeholder маршрути */}
-                <Route path="/search" element={<h1>Търсене на книги</h1>} />
                 <Route path="/collections" element={<h1>Колекции</h1>} />
                 <Route path="/profile" element={<h1>Настройки на профила</h1>} />
                 <Route path="/challenges" element={<h1>Предизвикателства</h1>} />
+                <Route path="/search" element={<SearchPage />} />
+                <Route path="/books/:googleBooksId" element={<BookDetailsPage />} />
             </Routes>
         </Router>
     );

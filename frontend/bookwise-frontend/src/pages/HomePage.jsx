@@ -23,7 +23,8 @@ const HomePage = () => {
                     "Content-Type": "application/json",
                 },
             });
-
+            
+            localStorage.setItem("userId", response.data.userId);
             localStorage.setItem("token", response.data.token);
             setMessage("Входът е успешен!");
 
