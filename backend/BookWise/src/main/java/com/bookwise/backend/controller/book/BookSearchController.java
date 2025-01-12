@@ -3,6 +3,7 @@ package com.bookwise.backend.controller.book;
 import com.bookwise.backend.model.Book;
 import com.bookwise.backend.service.BookSearchService;
 import com.bookwise.backend.service.BookService;
+import com.bookwise.backend.service.UserPreferencesService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +20,12 @@ public class BookSearchController {
 
     private final BookSearchService bookSearchService;
     private final BookService bookService;
+    private final UserPreferencesService preferencesService;
 
     public BookSearchController(BookSearchService bookSearchService, BookService bookService) {
         this.bookSearchService = bookSearchService;
         this.bookService = bookService;
+        this.preferencesService = new UserPreferencesService();
     }
 
     @GetMapping("/search")
@@ -40,7 +43,7 @@ public class BookSearchController {
     }
 
     @GetMapping("/{googleBooksId}")
-    public ResponseEntity<?> openBookPage(@PathVariable String googleBooksId) {
+    public ResponseEntity<?> openBookPage(@PathVariable String googleBooksId, @RequestParam String userId) {
         try {
             // 1. Проверка дали книгата е налична в кеша (базата данни)
             Book cachedBook = bookService.getCachedBook(googleBooksId);
@@ -52,10 +55,9 @@ public class BookSearchController {
             // 2. Ако книгата не е в базата, вземи я от Google Books API
             Book fetchedBook = bookSearchService.fetchBookById(googleBooksId);
             if (fetchedBook != null) {
-                System.out.println("Book fetched from Google Books API: " + fetchedBook.getTitle());
-                // Запази книгата в базата данни
                 bookService.cacheBook(fetchedBook);
-                System.out.println("Book cached successfully: " + fetchedBook.getTitle());
+                preferencesService.updateGenres(userId, fetchedBook.getGenres());
+                bookService.incrementPopularity(googleBooksId);
                 return ResponseEntity.ok(fetchedBook);
             }
 
