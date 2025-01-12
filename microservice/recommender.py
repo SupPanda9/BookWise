@@ -48,11 +48,13 @@ class Recommender:
         for book in books:
             volume_info = book.get("volumeInfo", {})
             results.append({
+                "googleBooksId": book.get("id", "Unknown ID"),
                 "title": volume_info.get("title", "Unknown Title"),
                 "authors": volume_info.get("authors", ["Unknown Author"]),
                 "rating": volume_info.get("averageRating", 0),
                 "description": volume_info.get("description", "No description available."),
                 "categories": volume_info.get("categories", []),
+                "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail", ""),
                 "isbn": self._get_isbn(volume_info),
                 "similarity": 0
             })
