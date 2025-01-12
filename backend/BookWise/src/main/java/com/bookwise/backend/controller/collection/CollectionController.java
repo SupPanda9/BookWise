@@ -1,5 +1,6 @@
 package com.bookwise.backend.controller.collection;
 
+import com.bookwise.backend.model.Book;
 import com.bookwise.backend.model.Collection;
 import com.bookwise.backend.service.CollectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,6 +76,17 @@ public class CollectionController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{collectionId}/books/details")
+    public ResponseEntity<?> getBooksInCollectionWithDetails(@PathVariable String collectionId) {
+        try {
+            List<Book> books = collectionService.getBooksInCollectionWithDetails(collectionId);
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error fetching book details: " + e.getMessage());
         }
     }
 

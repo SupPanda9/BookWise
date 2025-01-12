@@ -1,8 +1,10 @@
 package com.bookwise.backend.service;
 
+import com.bookwise.backend.model.Book;
 import com.bookwise.backend.model.Collection;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -13,6 +15,9 @@ import java.util.UUID;
 public class CollectionService {
 
     private final Firestore db = FirestoreClient.getFirestore();
+
+    @Autowired
+    private BookService bookService;
 
     public String createCollection(String userId, String name, boolean isPublic) throws Exception {
         // Create a new collection
@@ -86,5 +91,34 @@ public class CollectionService {
 
     public void deleteCollection(String collectionId) throws Exception {
         db.collection("collections").document(collectionId).delete().get();
+    }
+
+    public List<Book> getBooksInCollectionWithDetails(String collectionId) throws Exception {
+        var collectionDoc = db.collection("collections").document(collectionId).get().get();
+        if (!collectionDoc.exists()) {
+            throw new Exception("Collection not found.");
+        }
+
+        var collection = collectionDoc.toObject(Collection.class);
+        if (collection.getBooks() == null || collection.getBooks().isEmpty()) {
+            return new ArrayList<>(); // Връщаме празен списък, ако няма книги
+        }
+
+        List<Book> books = new ArrayList<>();
+        for (String bookId : collection.getBooks()) {
+            var bookDoc = db.collection("books").document(bookId).get().get();
+            if (bookDoc.exists()) {
+                Book book = bookDoc.toObject(Book.class);
+                books.add(book);
+            } else {
+                System.err.println("Book not found in Firestore for ID: " + bookId);
+                Book book = new Book();
+                book.setGoogleBooksId(bookId);
+                book.setDescription("Информацията за книгата не е налична");
+                book.setCoverImage(null);
+                books.add(book);
+            }
+        }
+        return books;
     }
 }
