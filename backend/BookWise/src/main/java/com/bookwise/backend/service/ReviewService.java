@@ -69,7 +69,7 @@ public class ReviewService {
         if (reviews == null || !reviews.containsKey(reviewId)) {
             throw new RuntimeException("Review not found: " + reviewId);
         }
-        
+
         updatedReview.setId(reviewId);
         reviews.put(reviewId, updatedReview);
 

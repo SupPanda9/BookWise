@@ -68,4 +68,15 @@ public class BookSearchController {
         }
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<?> getPopularBooks(
+        @RequestParam String genre,
+        @RequestParam String period) {
+        try {
+            List<Book> books = bookService.getPopularBooksByGenre(genre, period);
+            return ResponseEntity.ok(books);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

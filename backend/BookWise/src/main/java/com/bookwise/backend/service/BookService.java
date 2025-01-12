@@ -6,7 +6,9 @@ import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
@@ -64,5 +66,34 @@ public class BookService {
 
             book.setPopularity(popularity);
         }
+    }
+
+    public List<Book> getPopularBooksByGenre(String genre, String period)
+        throws ExecutionException, InterruptedException {
+        var booksCollection = db.collection("books").get().get();
+
+        List<Book> filteredBooks = new ArrayList<>();
+        for (var doc : booksCollection.getDocuments()) {
+            Book book = doc.toObject(Book.class);
+
+            if (book == null || book.getGenres() == null || !book.getGenres().contains(genre)) {
+                continue;
+            }
+
+            Book.Popularity popularity = book.getPopularity() != null ? book.getPopularity().get(period) : null;
+            if (popularity != null && popularity.getTotal() > 0) {
+                filteredBooks.add(book);
+            }
+        }
+
+        // Сортиране по популярност
+        filteredBooks.sort(Comparator.comparingInt(
+            (Book book) -> {
+                Book.Popularity popularity = book.getPopularity().get(period);
+                return popularity != null ? popularity.getTotal() : 0;
+            }
+        ).reversed());
+
+        return filteredBooks;
     }
 }
