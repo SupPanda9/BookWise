@@ -1,11 +1,13 @@
 package com.bookwise.backend.service;
 
 import com.bookwise.backend.model.Review;
+import com.google.cloud.firestore.FieldValue;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,6 @@ public class ReviewService {
     public void addReview(String bookId, Review review) throws ExecutionException, InterruptedException {
         var doc = db.collection(REVIEW_COLLECTION).document(bookId).get().get();
 
-        // Проверка дали вече има ревюта за книгата
         @SuppressWarnings("unchecked")
         Map<String, Object> reviews = doc.exists()
             ? (Map<String, Object>) doc.get("reviews")
@@ -34,10 +35,23 @@ public class ReviewService {
 
         // Генериране на уникален ID за ревюто
         String reviewId = UUID.randomUUID().toString();
-        review.setId(reviewId); // Увери се, че класът Review има поле `id`
+        review.setId(reviewId);
+
+        // Проверете дали текстът на ревюто е зададен
+        if (review.getText() == null || review.getText().isEmpty()) {
+            throw new IllegalArgumentException("Text cannot be null or empty");
+        }
+
+        System.out.println(review);
 
         // Добавяне на ревюто
-        reviews.put(reviewId, review);
+        reviews.put(reviewId, Map.of(
+            "id", review.getId(),
+            "userId", review.getUserId(),
+            "rating", review.getRating(),
+            "text", review.getText(), // Добавяме текста
+            "timestamp", Instant.now().toString() // Задаваме текущо време
+        ));
 
         // Актуализация на документа
         db.collection(REVIEW_COLLECTION).document(bookId).set(Map.of("reviews", reviews)).get();
@@ -48,7 +62,8 @@ public class ReviewService {
         var doc = db.collection(REVIEW_COLLECTION).document(bookId).get().get();
 
         if (!doc.exists()) {
-            throw new RuntimeException("No reviews found for the book");
+            System.out.println("Документът за ревюта не съществува за книга с ID: " + bookId);
+            return Map.of(); // Връщаме празна карта
         }
 
         @SuppressWarnings("unchecked")
@@ -71,6 +86,7 @@ public class ReviewService {
         }
 
         updatedReview.setId(reviewId);
+        updatedReview.setTimestamp(Instant.now().toString());
         reviews.put(reviewId, updatedReview);
 
         db.collection(REVIEW_COLLECTION).document(bookId).update("reviews", reviews).get();

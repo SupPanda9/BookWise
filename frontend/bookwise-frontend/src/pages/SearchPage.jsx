@@ -18,7 +18,7 @@ const SearchPage = () => {
             const response = await axios.get("http://localhost:8080/books/search", {
                 params: {
                     query,
-                    maxResults: 10,
+                    maxResults: 12,
                     sort: "popularity",
                 },
             });
@@ -32,6 +32,7 @@ const SearchPage = () => {
     };
 
     const handleBookClick = (googleBooksId) => {
+        console.log(googleBooksId);
         navigate(`/books/${googleBooksId}`);
     };
 

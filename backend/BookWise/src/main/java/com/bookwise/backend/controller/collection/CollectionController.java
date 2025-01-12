@@ -32,7 +32,14 @@ public class CollectionController {
             boolean isPublic = (Boolean) requestBody.get("isPublic");
 
             String collectionId = collectionService.createCollection(userId, name, isPublic);
-            return ResponseEntity.ok("Collection created with ID: " + collectionId);
+            Map<String, Object> newCollection = Map.of(
+                "id", collectionId,
+                "name", name,
+                "isPublic", isPublic,
+                "books", List.of() // Празен списък с книги, ако колекцията е нова
+            );
+
+            return ResponseEntity.ok(newCollection);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }

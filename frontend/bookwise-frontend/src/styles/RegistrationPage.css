@@ -1,0 +1,110 @@
+body {
+    background-color: #D2B48C; /* Светло кафяв фон */
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-container {
+    background-color: #fff; /* Бял фон за формата */
+    padding: 20px; /* Намаляване на височината */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 800px; /* Широка форма */
+    max-width: 90%;
+}
+
+.form-container h1 {
+    font-family: 'Cursive', sans-serif;
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #d3a15c; /* Светло кафяв текст */
+}
+
+.form-container h4 {
+    font-size: 20px; /* По-голям текст */
+    color: #d3a15c; /* Цветът на регистрацията */
+    margin-top: -15px; /* Преместване нагоре */
+}
+
+.form-container p {
+    font-size: 16px;
+    color: #6b4f33;
+    margin-bottom: 30px;
+}
+
+.form-container input {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.genres-container {
+    width: calc(100% - 20px);
+    padding-left: 10px;
+    display: flex; /* Превключваме на Flexbox */
+    justify-content: space-between; /* Равномерно разпределение от край до край */
+    flex-wrap: wrap; /* Позволява пренасяне на следващ ред, ако няма място */
+    gap: 10px; /* Разстояние между редовете */
+    margin-bottom: 20px;
+}
+
+.genre-button {
+    flex: 1 1 calc(20% - 10px); /* Всеки бутон заема 20% от ширината (5 на ред) */
+    padding: 15px; /* Увеличаване на размера на кутиите */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: center;
+    height: 80px;
+    white-space: nowrap; /* За да не се чупи текста */
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.genre-button.active {
+    background-color: #D3A15C; /* Активен фон */
+    color: #fff; /* Бял текст */
+    border-color: #8e5924; /* Подчертано с леко по-тъмен цвят */
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    flex-direction: row-reverse; /* Размяна на реда на бутоните */
+}
+
+.register-button,
+.back-button {
+    width: 120px; /* По-тесни бутони */
+    padding: 8px; /* Намалена височина */
+    background-color: #d3a15c; /* Светло кафяв фон */
+    color: #fff; /* Бял текст */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px; /* По-малък текст */
+    cursor: pointer;
+}
+
+.register-button:hover,
+.back-button:hover {
+    background-color: #b57b42;
+}
+
+.message {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #6b4f33;
+}
+

@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import RegistrationPage from "./pages/RegistrationPage";
-import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
 import SearchPage from "./pages/SearchPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
@@ -13,7 +12,6 @@ function App() {
             <Routes>
                 <Route path="/" element={<HomePage />} />
                 <Route path="/registration" element={<RegistrationPage />} />
-                <Route path="/login" element={<LoginPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 {/* Placeholder маршрути */}
                 <Route path="/collections" element={<h1>Колекции</h1>} />

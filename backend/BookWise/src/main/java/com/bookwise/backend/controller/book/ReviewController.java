@@ -5,6 +5,7 @@ import com.bookwise.backend.model.Review;
 import com.bookwise.backend.service.BookService;
 import com.bookwise.backend.service.ReviewService;
 import com.bookwise.backend.service.UserPreferencesService;
+import com.google.cloud.firestore.FieldValue;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.Instant;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/reviews")
@@ -41,7 +45,13 @@ public class ReviewController {
                 System.out.println("Genres for book not found or empty.");
             }
 
-            return ResponseEntity.ok("Review added successfully");
+            return ResponseEntity.ok(Map.of(
+                "id", review.getId(),
+                "userId", review.getUserId(),
+                "rating", review.getRating(),
+                "text", review.getText(),
+                "timestamp", Instant.now().toString()
+            ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

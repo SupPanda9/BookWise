@@ -34,7 +34,7 @@ public class BookSearchController {
         @RequestParam(required = false) String genre,
         @RequestParam(required = false) String author,
         @RequestParam(required = false) String isbn,
-        @RequestParam(defaultValue = "10") int maxResults,
+        @RequestParam(defaultValue = "12") int maxResults,
         @RequestParam(defaultValue = "0") int startIndex,
         @RequestParam(defaultValue = "popularity") String sort
     ) {

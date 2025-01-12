@@ -16,6 +16,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class UserService {
@@ -221,5 +222,21 @@ public class UserService {
 
     private void saveUser(String userId, User user, Firestore db) throws Exception {
         db.collection("users").document(userId).set(user).get();
+    }
+
+    public String getUserIdByEmail(String email) throws ExecutionException, InterruptedException {
+        Firestore db = FirestoreClient.getFirestore();
+
+        var querySnapshot = db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .get();
+
+        if (querySnapshot.isEmpty()) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        // Вземаме userId от първия намерен документ
+        return querySnapshot.getDocuments().get(0).getId();
     }
 }

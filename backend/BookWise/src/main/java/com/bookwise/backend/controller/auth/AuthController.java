@@ -85,8 +85,13 @@ public class AuthController {
             // Authenticate user
             String token = userService.authenticateUser(email, password);
 
+            String userId = userService.getUserIdByEmail(email);
+
             // Return the JWT token if authentication is successful
-            return ResponseEntity.ok(Map.of("token", token));
+            return ResponseEntity.ok(Map.of(
+                "token", token,
+                "userId", userId
+            ));
         } catch (IllegalArgumentException e) {
             // Handle invalid credentials
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());

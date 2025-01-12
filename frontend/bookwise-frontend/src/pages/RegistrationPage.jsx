@@ -34,6 +34,7 @@ const RegistrationPage = () => {
     // Обработва избора на жанрове
     const handleGenreSelect = (genre) => {
         setFormData((prevData) => {
+            console.log(prevData.preferences);
             if (prevData.preferences.includes(genre)) {
                 // Премахва жанра, ако вече е избран
                 return {

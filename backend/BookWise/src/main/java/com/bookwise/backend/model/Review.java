@@ -10,4 +10,15 @@ public class Review {
     private String text; // Текст на ревюто
     private String timestamp; // Дата и час на ревюто
     private String userId; // ID на потребителя, който е написал ревюто
+
+    @Override
+    public String toString() {
+        return "Review{" +
+            "id='" + id + '\'' +
+            ", userId='" + userId + '\'' +
+            ", rating=" + rating +
+            ", text='" + text + '\'' +
+            ", timestamp=" + timestamp +
+            '}';
+    }
 }
