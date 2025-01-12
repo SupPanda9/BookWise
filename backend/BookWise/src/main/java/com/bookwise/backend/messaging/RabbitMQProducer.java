@@ -24,9 +24,10 @@ public class RabbitMQProducer {
             String requestId = UUID.randomUUID().toString();
             payload.put("requestId", requestId);
 
+            System.out.println("Publishing to RabbitMQ [Exchange: recommendations_exchange]: " + payload);
             // Convert payload to JSON and send
             String message = objectMapper.writeValueAsString(payload);
-            rabbitTemplate.convertAndSend(queueName, message);
+            rabbitTemplate.convertAndSend("recommendations_exchange", "recommendations_request_queue", message);
             System.out.println("Message sent to queue '" + queueName + "': " + message);
 
             return requestId; // Return the generated requestId

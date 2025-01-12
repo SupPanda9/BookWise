@@ -38,5 +38,5 @@
 from consumer import start_consumer
 
 if __name__ == "__main__":
-    queue_name = "recommendation_request_queue"
+    queue_name = "recommendations_request_queue"
     start_consumer(queue_name)

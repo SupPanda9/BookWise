@@ -50,7 +50,7 @@ def start_consumer(queue_name):
     channel = connection.channel()
 
     # Declare the queue (ensures it exists)
-    channel.queue_declare(queue=queue_name)
+    channel.queue_declare(queue=queue_name, passive=True)
 
     # Start consuming messages with manual acknowledgment
     channel.basic_consume(queue=queue_name, on_message_callback=callback, auto_ack=False)
