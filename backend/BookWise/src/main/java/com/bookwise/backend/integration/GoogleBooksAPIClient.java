@@ -19,9 +19,30 @@ public class GoogleBooksAPIClient {
         this.apiKey = apiKey;
     }
 
-    public JsonNode searchBooks(String query, int maxResults, int startIndex) {
-        String url = String.format("%s?q=%s&maxResults=%d&startIndex=%d&key=%s",
-            API_URL, query, maxResults, startIndex, apiKey);
+    public JsonNode searchBooks(String query, String genre, String author, String isbn, int maxResults,
+                                int startIndex) {
+        StringBuilder urlBuilder = new StringBuilder(API_URL + "?q=");
+        if (query != null && !query.isEmpty()) {
+            urlBuilder.append(query).append("+");
+        }
+        if (genre != null && !genre.isEmpty()) {
+            urlBuilder.append("subject:").append("\"").append(genre).append("\"").append("+");
+        }
+        if (author != null && !author.isEmpty()) {
+            urlBuilder.append("inauthor:").append("\"").append(author).append("\"").append("+");
+        }
+        if (isbn != null && !isbn.isEmpty()) {
+            urlBuilder.append("isbn:").append(isbn).append("+");
+        }
+        if (urlBuilder.charAt(urlBuilder.length() - 1) == '+') {
+            urlBuilder.setLength(urlBuilder.length() - 1);
+        }
+        urlBuilder.append("&maxResults=").append(maxResults)
+            .append("&startIndex=").append(startIndex)
+            .append("&langRestrict=en")
+            .append("&key=").append(apiKey);
+
+        String url = urlBuilder.toString();
         try {
             String response = restTemplate.getForObject(url, String.class);
             ObjectMapper mapper = new ObjectMapper();
@@ -30,4 +51,16 @@ public class GoogleBooksAPIClient {
             throw new RuntimeException("Failed to fetch books from Google Books API", e);
         }
     }
+
+    public JsonNode getBookById(String googleBooksId) {
+        String url = API_URL + "/" + googleBooksId + "?key=" + apiKey;
+        try {
+            String response = restTemplate.getForObject(url, String.class);
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readTree(response);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to fetch book by ID: " + googleBooksId, e);
+        }
+    }
+
 }

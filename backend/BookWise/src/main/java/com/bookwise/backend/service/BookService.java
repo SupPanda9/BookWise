@@ -5,72 +5,64 @@ import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 @Service
 public class BookService {
 
-    private static final int DAYS_IN_PERIOD = 30;
-
     private final Firestore db = FirestoreClient.getFirestore();
+    private static final String BOOK_COLLECTION = "books";
+    private static final int WEEK = 7;
+    private static final int MONTH = 30;
 
-    public Book getBookDetails(String googleBooksId) throws ExecutionException, InterruptedException {
-        Book cachedBook = getCachedBook(googleBooksId);
-        if (cachedBook != null) {
-            return cachedBook;
-        }
-        throw new RuntimeException("Book is not cached.");
+    public void incrementPopularity(String googleBooksId) throws ExecutionException, InterruptedException {
+        var doc = db.collection(BOOK_COLLECTION).document(googleBooksId).get().get();
+        if (!doc.exists()) return;
+
+        Book book = doc.toObject(Book.class);
+        if (book == null) return;
+
+        book.incrementPopularity();
+        db.collection(BOOK_COLLECTION).document(googleBooksId).set(book).get();
+    }
+
+    public Book getCachedBook(String googleBooksId) throws ExecutionException, InterruptedException {
+        var doc = db.collection(BOOK_COLLECTION).document(googleBooksId).get().get();
+        return doc.exists() ? doc.toObject(Book.class) : null;
     }
 
     public void cacheBook(Book book) throws ExecutionException, InterruptedException {
-        db.collection("books").document(book.getGoogleBooksId()).set(book).get();
+        if (book == null || book.getGoogleBooksId() == null) {
+            throw new IllegalArgumentException("Book or Google Books ID cannot be null");
+        }
+
+        // Инициализиране на популярността
+        initializePopularity(book);
+
+        // Увери се, че жанровете са правилно настроени
+        if (book.getGenres() == null || book.getGenres().isEmpty()) {
+            book.setGenres(new ArrayList<>()); // Ако няма жанрове, създай празен списък
+        }
+
+        db.collection(BOOK_COLLECTION).document(book.getGoogleBooksId()).set(book).get();
+        System.out.println("Book saved to Firestore: " + book.getTitle());
     }
 
-    public void incrementPopularity(String googleBooksId) throws ExecutionException, InterruptedException {
-        var doc = db.collection("books").document(googleBooksId).get().get();
-        if (!doc.exists()) return;
+    private void initializePopularity(Book book) {
+        if (book.getPopularity() == null) {
+            Map<String, Book.Popularity> popularity = new HashMap<>();
+            popularity.put("last7Days", new Book.Popularity(WEEK));
+            popularity.put("last30Days", new Book.Popularity(MONTH));
 
-        @SuppressWarnings("unchecked")
-        Map<String, Object> popularity = (Map<String, Object>) doc.get("popularity");
-        if (popularity == null) popularity = new HashMap<>();
+            Book.Popularity yearPopularity = new Book.Popularity(0); // Само total
+            yearPopularity.setDays(null);
+            yearPopularity.setTotal(0);
+            popularity.put("thisYear", yearPopularity);
 
-        updatePopularity(popularity, "last7Days");
-        updatePopularity(popularity, "last30Days");
-
-        int thisYear = Optional.ofNullable((Integer) popularity.get("thisYear")).orElse(0);
-        popularity.put("thisYear", thisYear + 1);
-
-        db.collection("books").document(googleBooksId).update("popularity", popularity).get();
-    }
-
-    private void updatePopularity(Map<String, Object> popularity, String key) {
-        @SuppressWarnings("unchecked")
-        Map<String, Object> period = (Map<String, Object>) popularity.get(key);
-        if (period == null) period = new HashMap<>();
-
-        @SuppressWarnings("unchecked")
-        List<Integer> days = (List<Integer>) period.get("days");
-        if (days == null) days = new ArrayList<>(Collections.nCopies(DAYS_IN_PERIOD, 0));
-
-        int todayIndex = LocalDate.now().getDayOfMonth() - 1;
-        days.set(todayIndex, days.get(todayIndex) + 1);
-
-        int total = days.stream().mapToInt(Integer::intValue).sum();
-        period.put("days", days);
-        period.put("total", total);
-
-        popularity.put(key, period);
-    }
-
-    private Book getCachedBook(String googleBooksId) throws ExecutionException, InterruptedException {
-        var doc = db.collection("books").document(googleBooksId).get().get();
-        return doc.exists() ? doc.toObject(Book.class) : null;
+            book.setPopularity(popularity);
+        }
     }
 }
