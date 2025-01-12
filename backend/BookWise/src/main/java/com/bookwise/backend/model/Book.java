@@ -29,6 +29,8 @@ public class Book {
         private List<Integer> days; // За последните 7 или 30 дни
         private Integer total; // Обща популярност за периода
 
+        public Popularity() { }
+
         public Popularity(int daysCount) {
             this.days = new ArrayList<>(Collections.nCopies(daysCount, 0));
             this.total = 0;
