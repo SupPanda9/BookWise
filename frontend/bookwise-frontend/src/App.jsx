@@ -7,6 +7,7 @@ import SearchPage from "./pages/SearchPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
+import ProfileSettingsPage from "./pages/ProfileSettingPage";
 
 function App() {
     return (
@@ -18,7 +19,7 @@ function App() {
                 {/* Placeholder маршрути */}
                 <Route path="/collections" element={<CollectionsPage />} />
                 <Route path="/collections/:collectionId" element={<CollectionDetailsPage />} />
-                <Route path="/profile" element={<h1>Настройки на профила</h1>} />
+                <Route path="/profile" element={<ProfileSettingsPage />} />
                 <Route path="/challenges" element={<h1>Предизвикателства</h1>} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/books/:googleBooksId" element={<BookDetailsPage />} />

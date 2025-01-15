@@ -136,11 +136,18 @@ public class UserService {
     }
 
     private void updateEmail(String userId, User user, String email, Firestore db) throws Exception {
+        if (!isValidEmail(email)) {
+            throw new IllegalArgumentException("Invalid email format");
+        }
         var emailQuery = db.collection("users").whereEqualTo("email", email).get().get();
         if (!emailQuery.isEmpty() && !emailQuery.getDocuments().get(0).getId().equals(userId)) {
             throw new Exception("Email is already in use.");
         }
         user.setEmail(email);
+    }
+
+    private boolean isValidEmail(String email) {
+        return email != null && email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$");
     }
 
     private void updatePreferences(User user, List<String> preferences) {
@@ -238,5 +245,21 @@ public class UserService {
 
         // Вземаме userId от първия намерен документ
         return querySnapshot.getDocuments().get(0).getId();
+    }
+
+    public User getUserById(String userId) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        var userDoc = db.collection("users").document(userId).get().get();
+        if (!userDoc.exists()) {
+            throw new Exception("User not found.");
+        }
+
+        User user = userDoc.toObject(User.class);
+        if (user == null) {
+            throw new Exception("Failed to deserialize user.");
+        }
+
+        return user;
     }
 }
