@@ -5,6 +5,7 @@ import com.bookwise.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,4 +101,37 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
         }
     }
+
+    @PostMapping("/send-confirmation")
+    public ResponseEntity<?> sendEmailConfirmation(@RequestParam String email) {
+        try {
+            String confirmationToken = userService.generateEmailConfirmationToken(email);
+            // Логика за изпращане на имейл с линк към потвърждението
+            // emailService.sendConfirmationEmail(email, confirmationToken);
+            return ResponseEntity.ok("Confirmation email sent.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/confirm-email")
+    public ResponseEntity<?> confirmEmail(@RequestBody Map<String, String> requestBody) {
+        String email = requestBody.get("email");
+        if (email == null || email.isEmpty()) {
+            return ResponseEntity.badRequest().body("Email is required");
+        }
+
+        try {
+            User user = userService.getUserByEmail(email);
+            if (user.isEnabled()) {
+                return ResponseEntity.ok("User is already enabled");
+            }
+
+            userService.confirmEmail(email);
+            return ResponseEntity.ok("User enabled successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error enabling user: " + e.getMessage());
+        }
+    }
+
 }

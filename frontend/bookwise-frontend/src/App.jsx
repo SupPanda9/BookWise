@@ -8,6 +8,8 @@ import BookDetailsPage from "./pages/BookDetailsPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import ProfileSettingsPage from "./pages/ProfileSettingPage";
+import EmailConfirmationPage from "./pages/EmailConfirmationPage";
+import "../src/config/firebaseConfig"; 
 
 function App() {
     return (
@@ -16,13 +18,13 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/registration" element={<RegistrationPage />} />
                 <Route path="/dashboard" element={<Dashboard />} />
-                {/* Placeholder маршрути */}
                 <Route path="/collections" element={<CollectionsPage />} />
                 <Route path="/collections/:collectionId" element={<CollectionDetailsPage />} />
                 <Route path="/profile" element={<ProfileSettingsPage />} />
                 <Route path="/challenges" element={<h1>Предизвикателства</h1>} />
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/books/:googleBooksId" element={<BookDetailsPage />} />
+                <Route path="/confirm-email" element={<EmailConfirmationPage />} />
             </Routes>
         </Router>
     );

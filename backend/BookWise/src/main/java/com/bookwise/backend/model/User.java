@@ -12,6 +12,7 @@ public class User {
     private String password;
     private List<String> roles;
     private boolean enabled;
+    private String confirmationToken;
 
     private List<String> readBooks; // Updated to store only book IDs
     private List<String> collections;

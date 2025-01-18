@@ -7,6 +7,8 @@ import com.bookwise.backend.model.User;
 import com.bookwise.backend.security.JwtTokenProvider;
 import com.bookwise.backend.security.PasswordValidator;
 import com.google.cloud.firestore.Firestore;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserRecord;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -54,6 +56,23 @@ public class UserService {
         user.setPreferences(preferences);
 
         FirestoreClient.getFirestore().collection("users").document(user.getId()).set(user).get();
+
+        // Create Firebase Auth user
+        UserRecord.CreateRequest request = new UserRecord.CreateRequest()
+            .setEmail(user.getEmail())
+            .setEmailVerified(false)
+            .setPassword(user.getPassword())
+            .setDisplayName(user.getUsername());
+
+        UserRecord userRecord = FirebaseAuth.getInstance().createUser(request);
+
+        try {
+            String link = FirebaseAuth.getInstance().generateEmailVerificationLink(userRecord.getEmail());
+
+            System.out.println("Generated verification link: " + link);
+        } catch (Exception e) {
+            System.err.println("Error sending verification email: " + e.getMessage());
+        }
     }
 
     public String authenticateUser(String email, String password) throws Exception {
@@ -262,4 +281,57 @@ public class UserService {
 
         return user;
     }
+
+    public String generateEmailConfirmationToken(String email) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        User user = getUserByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        String token = UUID.randomUUID().toString();
+        user.setConfirmationToken(token);
+        db.collection("users").document(user.getId()).set(user);
+        return token;
+    }
+
+    public User getUserByEmail(String email) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        var querySnapshot = db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .get();
+
+        if (querySnapshot.isEmpty()) {
+            throw new IllegalArgumentException("User not found for the provided email");
+        }
+
+        var userDoc = querySnapshot.getDocuments().get(0);
+        User user = userDoc.toObject(User.class);
+        if (user == null) {
+            throw new Exception("Failed to deserialize user.");
+        }
+
+        user.setId(userDoc.getId()); // Assign the Firestore document ID to the user
+        return user;
+    }
+
+    public void confirmEmail(String email) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+
+        User user = db.collection("users")
+            .whereEqualTo("email", email)
+            .get()
+            .get()
+            .toObjects(User.class)
+            .stream()
+            .findFirst()
+            .orElseThrow(() -> new IllegalArgumentException("User not found."));
+
+        user.setEnabled(true);
+        db.collection("users").document(user.getId()).set(user);
+    }
+
 }

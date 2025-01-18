@@ -74,6 +74,9 @@ const RegistrationPage = () => {
                     "Content-Type": "application/json",
                 },
             });
+            await axios.post("http://localhost:8080/auth/send-confirmation", null, {
+                params: { email: formData.email },
+            });
             setMessage("Регистрацията е успешна!");
         } catch (error) {
             console.error("Грешка при регистрацията:", error);
