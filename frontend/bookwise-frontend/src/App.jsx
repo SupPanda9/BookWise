@@ -9,6 +9,7 @@ import CollectionsPage from "./pages/CollectionsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import ProfileSettingsPage from "./pages/ProfileSettingPage";
 import EmailConfirmationPage from "./pages/EmailConfirmationPage";
+import Recommendations from "./pages/Recommendations";
 import "../src/config/firebaseConfig"; 
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
                 <Route path="/search" element={<SearchPage />} />
                 <Route path="/books/:googleBooksId" element={<BookDetailsPage />} />
                 <Route path="/confirm-email" element={<EmailConfirmationPage />} />
+                <Route path="/recommendations" element={<Recommendations />} />
             </Routes>
         </Router>
     );

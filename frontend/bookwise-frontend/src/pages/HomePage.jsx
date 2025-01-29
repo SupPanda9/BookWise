@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import styles from "../styles/HomePage.module.css"; 
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -26,71 +27,68 @@ const HomePage = () => {
 
             localStorage.setItem("userId", response.data.userId);
             localStorage.setItem("token", response.data.token);
-            setMessage("Входът е успешен!");
+            setMessage("Successfully logged in!");
 
             // Пренасочване към Dashboard
             navigate("/dashboard");
         } catch (error) {
-            console.error("Грешка при входа:", error);
-            setMessage(error.response?.data || "Грешка при входа.");
+            console.error("Login error:", error);
+            setMessage(error.response?.data || "Login error.");
         }
     };
 
     return (
-        <div style={{ padding: "20px", textAlign: "center" }}>
-            <h1>Добре дошли в BookWise!</h1>
-            <p>Влезте в своя акаунт или се регистрирайте, ако нямате такъв.</p>
-            <form onSubmit={handleLogin} style={{ marginBottom: "20px" }}>
-                <div>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Имейл"
-                        onChange={handleChange}
-                        value={formData.email}
-                        required
-                        style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
-                    />
-                </div>
-                <div>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Парола"
-                        onChange={handleChange}
-                        value={formData.password}
-                        required
-                        style={{ padding: "10px", marginBottom: "20px", width: "100%" }}
-                    />
-                </div>
-                <button
-                    type="submit"
-                    style={{
-                        padding: "10px 20px",
-                        backgroundColor: "#28a745",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Вход
-                </button>
-            </form>
-            <button
-                onClick={() => navigate("/registration")}
-                style={{
-                    padding: "10px 20px",
-                    backgroundColor: "#007BFF",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                }}
-            >
-                Регистрация
-            </button>
-            {message && <p style={{ marginTop: "20px", color: message.includes("успешен") ? "green" : "red" }}>{message}</p>}
+        <div className={styles.pageWrapper}>
+            {/* Left Side: Login Form */}
+            <div className={styles.leftContainer}>
+                <h1 className={styles.formTitle}>Welcome to BookWise!</h1>
+                <p className={styles.subtitle}>Log into your account or register if you don't have one.</p>
+
+                <form onSubmit={handleLogin} className={styles.loginForm}>
+                    <div className={styles.inputRow}>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Имейл"
+                            onChange={handleChange}
+                            value={formData.email}
+                            required
+                        />
+                    </div>
+                    <div className={styles.inputRow}>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Парола"
+                            onChange={handleChange}
+                            value={formData.password}
+                            required
+                        />
+                    </div>
+
+                    <div className={styles.buttonsRow}>
+                        <button type="submit" className={styles.loginButton}>
+                            Login
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate("/registration")}
+                            className={styles.registerButton}
+                        >
+                            Register
+                        </button>
+                    </div>
+                </form>
+
+                {message && (
+                    <p className={`${styles.message} ${message.includes("успешен") ? styles.success : styles.error}`}>
+                        {message}
+                    </p>
+                )}
+            </div>
+
+            {/* Right Side: Books Image */}
+            <div className={styles.rightContainer}></div>
         </div>
     );
 };

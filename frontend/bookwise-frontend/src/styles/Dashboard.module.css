@@ -1,0 +1,233 @@
+/* Page Layout */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh; /* Ensure the background covers full height */
+    background-color: #f4e8d5;
+    display: flex;
+    flex-direction: column; 
+    background: url('../assets/bookshelves.jpg') repeat center center fixed;
+}
+
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: "Playfair Display", serif;
+    background-color: #f4e8d5;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+/* Gold Shine Animation */
+@keyframes shine {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+
+@keyframes shineHover {
+    0% { background-position: 100% center; }
+    100% { background-position: -100% center; }
+}
+
+/* Navbar */
+.navbar {
+    width: 95%;
+    max-width: 1200px;
+    background-color: #5C3D2E; /* Rich brown */
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 15px; /* Curved edges */
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+/* BookWise Logo - Infinite Shine */
+.navbar h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  /* Darker gold */
+        #ffcc00 45%,  /* Bright gold */
+        #ffd700 50%,  /* True gold */
+        #ffcc00 55%,  /* Bright gold */
+        #a67c00 90%   /* Darker gold */
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 10s infinite linear;
+}
+
+/* Navbar Buttons */
+.navLinks {
+    display: flex;
+    gap: 15px;
+}
+
+/* Golden Text Buttons */
+.navLinks button {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 10px 15px;
+    position: relative;
+    transition: all 0.5s ease-in-out;
+    
+    /* Gold Shine Effect */
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  
+        #ffcc00 45%,  
+        #ffd700 50%,  
+        #ffcc00 55%,  
+        #a67c00 90%   
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shineButton 1s ease-in-out;
+}
+
+/*  Hover Effect - Restart Animation */
+.navLinks button:hover {
+    animation: none; /* Stops ongoing animation */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transform: scale(1.1);
+    animation: shineHover 1s infinite linear;
+}
+
+/* Mobile Menu */
+.hamburger {
+    display: none;
+    cursor: pointer;
+}
+
+/* Mobile Dropdown Menu */
+.mobileMenu {
+    display: flex;
+    flex-direction: column;
+    background-color: #5C3D2E;
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    top: 60px;
+    left: 0;
+}
+
+.mobileMenu button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 15px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.mobileMenu button:hover {
+    background-color: #8C624A;
+}
+
+/* Main Content */
+.mainContent {
+    text-align: center;
+    padding: 50px;
+}
+
+/* Search Box */
+.searchContainer {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Gold-White Gradient Search Input */
+.searchInput {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #A67C52; /* Gold border */
+    border-radius: 8px;
+    font-size: 1rem;
+    text-align: center;
+    background-color: #f4f2eb;
+    color: #5C3D2E; /* Dark text */
+    font-weight: bold;
+
+    transition: all 0.3s ease-in-out;
+}
+
+.searchInput:hover, .searchInput:focus {
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.5);
+    border-color: #ffd700;
+    outline: none;
+}
+
+.searchDropdown {
+    position: absolute;
+    top: 100%; /* Ensures it appears below the search input */
+    left: 0;
+    width: 100%;
+    background: #fff9e6; /* Light gold background */
+    border: 2px solid #a67c00; /* Gold border */
+    border-radius: 5px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 10; /* Ensures it stays on top */
+}
+
+/* 📖 Book Result */
+.searchResult {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between image and text */
+    padding: 10px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #5C3D2E; /* Dark Brown for Readability */
+    text-align: left;
+}
+
+.searchResult:hover {
+    background: #ffeb99; /* Softer gold hover */
+    color: #000; /* Black text for contrast */
+}
+
+.searchResult img {
+    width: 100px; /* Adjusted size */
+    height: auto;
+    border-radius: 5px;
+}
+
+/* 📚 Title & Author Alignment */
+.bookInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start; /* Align text to left */
+}
+
+/* 🎉 Welcome Title */
+.welcomeTitle {
+    font-size: 2.5rem;
+    color: #5C3D2E;
+    margin: 0;
+}

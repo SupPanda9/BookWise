@@ -1,0 +1,122 @@
+/* Page Layout */
+.pageWrapper {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+}
+
+/* Left Side: Login Form */
+.leftContainer {
+    width: 40%;
+    background-color: #f4e8d5; /* Warmer cream */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+/* Title */
+.formTitle {
+    font-family: "Playfair Display", serif;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: #5C3D2E; /* Deep mocha */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+}
+
+/* Subtitle */
+.subtitle {
+    color: #6D4C41; /* Warm chocolate */
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+}
+
+/* Form */
+.loginForm {
+    width: 100%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* Input Fields */
+.inputRow {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.inputRow input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #a67c52; /* Elegant bronze border */
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #4A2F26; /* Deep espresso */
+    background-color: #fff;
+    box-sizing: border-box;
+}
+
+/* Buttons */
+.buttonsRow {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 1rem;
+}
+
+.loginButton {
+    background-color: #A67C52; /* Elegant bronze */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 48%;
+}
+
+.registerButton {
+    background-color: #855D34; /* Rich walnut */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 48%;
+}
+
+/* Hover Effects */
+.loginButton:hover {
+    background-color: #8C624A; /* Soft bronze */
+}
+
+.registerButton:hover {
+    background-color: #704D33; /* Darker walnut */
+}
+
+/* Success & Error Messages */
+.message {
+    margin-top: 1rem;
+    font-weight: bold;
+    text-align: center;
+}
+
+.success {
+    color: #2E7D32; /* Rich dark green */
+}
+
+.error {
+    color: #C62828; /* Deep red */
+}
+
+/* Right Side: Books Image */
+.rightContainer {
+    width: 60%;
+    background: url("../assets/books.jpg") center/cover no-repeat;
+}

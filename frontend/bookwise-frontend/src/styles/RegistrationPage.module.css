@@ -1,0 +1,172 @@
+/* RegistrationPage.module.css */
+
+  .inputRow input {
+    background-color: #f4e8d5 !important; /* Ensure background is white */
+    color: #000 !important; /* Ensure text color is black */
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+    background-color: #f4e8d5 !important;
+    color: #4A2F26  !important;
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    box-shadow: 0 0 0px 1000px white inset !important;
+  }
+
+  .pageWrapper {
+    background-color: #f4e8d5;
+    min-height: 100vh;
+    width: 100vw; /* Ensure full width */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #6D4C41;
+  }
+
+
+  /* Бял контейнер за формата */
+  .formContainer {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 700px; /* По-широка форма */
+    width: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+  }
+  
+  /* Заглавие на формата */
+  .formTitle {
+    font-family: "Playfair Display", serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #5C3D2E; /* Deep mocha */
+    text-align: center;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+  }
+  
+  /* Формата за регистрация */
+  .registerForm {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Блок с полетата за текст (username, email, password) */
+  .inputRow {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .inputRow input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #A67C52;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #4A2F26;
+    background-color: #fff;
+    box-sizing: border-box;
+  }
+  
+  /* Надпис за жанровете */
+  .genresTitle {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+  
+  /* Общ стил за редовете с жанрове */
+  .genresRow {
+    width: 100%;
+    margin-bottom: 1rem;
+    display: grid;
+    gap: 0.5rem; /* Разстояние между бутоните */
+    justify-content: center; /* Центриране по хоризонтала */
+  }
+  
+  /* Първи ред (5 жанра) */
+  .genresRow5 {
+    grid-template-columns: repeat(5, auto);
+  }
+  
+  /* Втори ред (4 жанра) */
+  .genresRow4 {
+    grid-template-columns: repeat(4, auto);
+  }
+  
+  /* Бутон за жанр */
+  .genreButton {
+    background-color: #A67C52; 
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+  }
+  
+  .genreButton:hover {
+    background-color: #8C624A;
+  }
+  
+  /* Избран жанр (да е постоянно с hover цвета) */
+  .selected {
+    background-color: #8C624A;
+    border: 2px solid #fff;
+    font-weight: bold;
+  }
+  
+  /* Ред за бутоните "Регистрация" и "Връщане назад" */
+  .buttonsRow {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 1rem;
+  }
+  
+  /* Бутоните за Регистрация и Връщане назад */
+  .registerButton,
+  .backButton {
+    background-color: #A67C52;
+    color: #fff;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .registerButton:hover,
+  .backButton:hover {
+    background-color: #704D33; /* По-тъмен при hover */
+  }
+  
+  /* Съобщение при успех/грешка */
+  .message {
+    margin-top: 1rem;
+    text-align: center;
+    font-weight: bold;
+    color: #6b4f33;
+  }
+  
+  .success {
+    color: #2E7D32; /* Deep green */
+  }
+
+  .error {
+      color: #C62828; /* Deep red */
+  }

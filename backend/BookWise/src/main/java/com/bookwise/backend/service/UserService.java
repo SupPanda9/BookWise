@@ -25,10 +25,12 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final EmailService emailService;
 
     @Autowired
-    public UserService(JwtTokenProvider jwtTokenProvider) {
+    public UserService(JwtTokenProvider jwtTokenProvider, EmailService emailService) {
         this.jwtTokenProvider = jwtTokenProvider;
+        this.emailService = emailService;
     }
 
     public void registerUser(User user) throws Exception {
@@ -70,6 +72,7 @@ public class UserService {
             String link = FirebaseAuth.getInstance().generateEmailVerificationLink(userRecord.getEmail());
 
             System.out.println("Generated verification link: " + link);
+            emailService.sendVerificationEmail(user.getEmail(), link);
         } catch (Exception e) {
             System.err.println("Error sending verification email: " + e.getMessage());
         }

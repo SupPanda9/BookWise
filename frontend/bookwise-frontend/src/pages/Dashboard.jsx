@@ -1,186 +1,113 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import styles from "../styles/Dashboard.module.css";
 
 const Dashboard = () => {
     const navigate = useNavigate();
-    const [query, setQuery] = useState(""); // Query for recommendations
-    const [genres, setGenres] = useState(""); // Genres for recommendations
-    const [recommendations, setRecommendations] = useState([]); // List of books
-    const [visibleBooks, setVisibleBooks] = useState(10); // Number of books to show initially
+    const [query, setQuery] = useState("");
+    const [books, setBooks] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [showButton, setShowButton] = useState(true); // Control button visibility
+    const [showDropdown, setShowDropdown] = useState(false);
+    const searchRef = useRef(null); // Track search container
 
-    const handleLogout = () => {
-        localStorage.removeItem("token");
-        navigate("/");
+    // Detect clicks outside search container
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (searchRef.current && !searchRef.current.contains(event.target)) {
+                setShowDropdown(false); // Hide dropdown when clicking outside
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleInputChange = (e) => {
+        setQuery(e.target.value);
+        setShowDropdown(true); // Show dropdown when typing
+        fetchBooks(e.target.value);
     };
 
-    const fetchRecommendations = async () => {
-        const userId = localStorage.getItem("userId");
-        if (!userId) {
-            setError("Не сте влезли в системата.");
+    const fetchBooks = async (searchTerm) => {
+        if (!searchTerm) {
+            setBooks([]);
             return;
         }
 
+        setLoading(true);
+        setError("");
+
         try {
-            setShowButton(false); // Hide the button when fetching starts
-            const response = await axios.post(`http://localhost:8080/recommendations/${userId}`, {
-                query,
-                genres: genres.split(",").map((genre) => genre.trim()),
+            const response = await axios.get("http://localhost:8080/books/search", {
+                params: { query: searchTerm, maxResults: 5, sort: "popularity" },
             });
-
-            console.log("Recommendations response:", response.data);
-            if (!response.data || !response.data.recommendations) {
-                throw new Error("Invalid response format from backend");
-            }
-
-            setRecommendations(response.data.recommendations);
-            setVisibleBooks(10);
-            setError("");
+            setBooks(response.data);
         } catch (err) {
-            console.error("Грешка при зареждане на препоръките:", err);
-            setError("Неуспешно зареждане на препоръките.");
-            setShowButton(true);
+            setError("Error loading search results.");
+        } finally {
+            setLoading(false);
         }
     };
 
+    const handleBookClick = (googleBooksId) => {
+        navigate(`/books/${googleBooksId}`);
+        setQuery("");
+        setBooks([]);
+        setShowDropdown(false); // Hide dropdown after selection
+    };
+
     return (
-        <div style={{ padding: "20px" }}>
-            <header
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "20px",
-                    borderBottom: "1px solid #ccc",
-                    paddingBottom: "10px",
-                }}
-            >
-                <h1>BookWise</h1>
-                <nav style={{ display: "flex", gap: "15px" }}>
-                    <button onClick={() => navigate("/search")} style={buttonStyle}>
-                        Търсене на книги
-                    </button>
-                    <button onClick={() => navigate("/collections")} style={buttonStyle}>
-                        Колекции
-                    </button>
-                    <button onClick={() => navigate("/profile")} style={buttonStyle}>
-                        Настройки на профила
-                    </button>
-                    <button onClick={() => navigate("/challenges")} style={buttonStyle}>
-                        Предизвикателства
-                    </button>
-                </nav>
-                <button
-                    onClick={handleLogout}
-                    style={{
-                        ...buttonStyle,
-                        backgroundColor: "#dc3545",
-                        color: "#fff",
-                    }}
-                >
-                    Изход
-                </button>
-            </header>
-            <main>
-                <h2>Добре дошли в BookWise!</h2>
-                <p>Изберете опция от менюто, за да започнете.</p>
+        <div className={styles.pageWrapper}>
+            <nav className={styles.navbar}>
+                <h2 className={styles.logo}>BookWise</h2>
+                <div className={styles.navLinks}>
+                    <button onClick={() => navigate("/recommendations")}>Recommendations</button>
+                    <button onClick={() => navigate("/collections")}>Collections</button>
+                    <button onClick={() => navigate("/profile")}>Profile</button>
+                    <button onClick={() => navigate("/challenges")}>Challenges</button>
+                    <button onClick={() => {
+                        localStorage.removeItem("token");
+                        localStorage.removeItem("userId");
+                        navigate("/");
+                    }} className={styles.logoutButton}>Logout</button>
+                </div>
+            </nav>
 
-                <h3>Препоръки</h3>
-                <div>
+            <main className={styles.mainContent}>
+                <h1 className={styles.welcomeTitle}>Welcome to BookWise!</h1>
+
+                {/* Search Bar */}
+                <div className={styles.searchContainer}>
                     <input
                         type="text"
+                        placeholder="Search for books..."
                         value={query}
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Въведете заявка"
-                        style={{ padding: "10px", marginRight: "10px" }}
+                        onChange={handleInputChange}
+                        className={styles.searchInput}
                     />
-                    <input
-                        type="text"
-                        value={genres}
-                        onChange={(e) => setGenres(e.target.value)}
-                        placeholder="Жанрове (разделени със запетаи)"
-                        style={{ padding: "10px", marginRight: "10px" }}
-                    />
-                    {showButton && (
-                        <button onClick={fetchRecommendations} style={buttonStyle}>
-                            Вземете препоръки
-                        </button>
-                    )}
-                </div>
+                    {loading && <p className={styles.loadingText}>Loading...</p>}
 
-                {error && <p style={{ color: "red" }}>{error}</p>}
-
-                <div style={{ marginTop: "20px" }}>
-                    {recommendations.slice(0, visibleBooks).map((book, index) => (
-                        <div
-                            key={index}
-                            style={{
-                                marginBottom: "20px",
-                                border: "1px solid #ccc",
-                                padding: "20px",
-                                backgroundColor: "#fff",
-                                color: "#000",
-                                borderRadius: "10px",
-                                boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-                                cursor: "pointer",
-                            }}
-                            onClick={() => navigate(`/books/${book.googleBooksId}`)} // Тук използваме googleBooksId за пренасочване
-                        >
-                            <div style={{ display: "flex", gap: "15px" }}>
-                                <img
-                                    src={book.thumbnail || "https://via.placeholder.com/150"}
-                                    alt={`${book.title} thumbnail`}
-                                    style={{
-                                        width: "150px",
-                                        height: "200px",
-                                        objectFit: "cover",
-                                        borderRadius: "5px",
-                                    }}
-                                />
-                                <div>
-                                    <h4>{book.title || "Няма заглавие"}</h4>
-                                    <p>
-                                        <strong>Google Books ID:</strong> {book.googleBooksId || "Няма ID"}
-                                    </p>
-                                    <p>
-                                        <strong>Автори:</strong> {book.authors?.join(", ") || "Неизвестни автори"}
-                                    </p>
-                                    <p>
-                                        <strong>Жанрове:</strong> {book.categories?.join(", ") || "Няма жанрове"}
-                                    </p>
-                                    <p>
-                                        <strong>Описание:</strong> {book.description || "Няма описание"}
-                                    </p>
-                                    <p>
-                                        <strong>Коефициент на точност:</strong> {book.similarity || "Няма рейтинг"}
-                                    </p>
+                    {/* Search Results Dropdown */}
+                    {books.length > 0 && (
+                        <div className={styles.searchDropdown}>
+                            {books.map((book) => (
+                                <div key={book.googleBooksId} className={styles.searchResult} onClick={() => handleBookClick(book.googleBooksId)}>
+                                    <img src={book.coverImage} alt={book.title} className={styles.bookImage} />
+                                    <div className={styles.bookInfo}>
+                                        <h4>{book.title}</h4>
+                                        <p>{book.authors?.join(", ")}</p>
+                                    </div>
                                 </div>
-                            </div>
+                            ))}
                         </div>
-                    ))}
-                    {visibleBooks < recommendations.length && (
-                        <button
-                            onClick={() => setVisibleBooks((prev) => prev + 10)}
-                            style={{ padding: "10px", marginTop: "10px" }}
-                        >
-                            Покажи още
-                        </button>
                     )}
                 </div>
+
+                {error && <p className={styles.errorText}>{error}</p>}
             </main>
         </div>
     );
-};
-
-const buttonStyle = {
-    padding: "10px 15px",
-    backgroundColor: "#007BFF",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
 };
 
 export default Dashboard;

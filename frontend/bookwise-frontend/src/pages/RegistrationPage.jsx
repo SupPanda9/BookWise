@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import styles from "../styles/RegistrationPage.module.css";
 
 const RegistrationPage = () => {
     const navigate = useNavigate();
@@ -77,103 +78,98 @@ const RegistrationPage = () => {
             await axios.post("http://localhost:8080/auth/send-confirmation", null, {
                 params: { email: formData.email },
             });
-            setMessage("Регистрацията е успешна!");
+            setMessage("Regiastration successful!");
         } catch (error) {
-            console.error("Грешка при регистрацията:", error);
-            setMessage(error.response?.data || "Грешка при регистрацията.");
+            console.error("Registration error:", error);
+            setMessage(error.response?.data || "Registration error.");
         }
     };
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h1>Регистрация</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <input
-                        name="username"
-                        placeholder="Потребителско име"
-                        onChange={handleChange}
-                        value={formData.username}
-                        required
-                        style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
-                    />
-                </div>
-                <div>
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Имейл"
-                        onChange={handleChange}
-                        value={formData.email}
-                        required
-                        style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
-                    />
-                </div>
-                <div>
-                    <input
-                        type="password"
-                        name="password"
-                        placeholder="Парола"
-                        onChange={handleChange}
-                        value={formData.password}
-                        required
-                        style={{ padding: "10px", marginBottom: "20px", width: "100%" }}
-                    />
-                </div>
-                <div>
-                    <h4>Избери жанрове:</h4>
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                        {popularGenres.map((genre) => (
+        <div className={styles.pageWrapper}>
+            <div className={styles.formContainer}>
+                <h1 className={styles.formTitle}>Registration</h1>
+                <form onSubmit={handleSubmit} className={styles.registerForm}>
+                    <div className={styles.inputRow}>
+                        <input
+                            name="username"
+                            placeholder="Username"
+                            onChange={handleChange}
+                            value={formData.username}
+                            required
+                            style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
+                        />
+                    </div>
+                    <div className={styles.inputRow}>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            onChange={handleChange}
+                            value={formData.email}
+                            required
+                            style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
+                        />
+                    </div>
+                    <div className={styles.inputRow}>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            onChange={handleChange}
+                            value={formData.password}
+                            required
+                            style={{ padding: "10px", marginBottom: "20px", width: "100%" }}
+                        />
+                    </div>
+                    <div className={styles.genresTitle}>Choose preferred genres: </div>
+                    <div className={`${styles.genresRow} ${styles.genresRow5}`}>
+                        {popularGenres.slice(0, 5).map((genre) => (
                             <button
                                 key={genre}
                                 type="button"
                                 onClick={() => handleGenreSelect(genre)}
-                                style={{
-                                    padding: "10px 20px",
-                                    borderRadius: "5px",
-                                    border: "1px solid #ccc",
-                                    backgroundColor: formData.preferences.includes(genre)
-                                        ? "#007BFF"
-                                        : "#fff",
-                                    color: formData.preferences.includes(genre) ? "#fff" : "#000",
-                                    cursor: "pointer",
-                                }}
+                                className={
+                                    formData.preferences.includes(genre)
+                                        ? `${styles.genreButton} ${styles.selected}`
+                                        : styles.genreButton
+                                }
                             >
                                 {genre}
                             </button>
                         ))}
                     </div>
-                </div>
-                <button
-                    type="submit"
-                    style={{
-                        marginTop: "20px",
-                        padding: "10px 20px",
-                        backgroundColor: "#28a745",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Регистрация
-                </button>
-            </form>
-            <button
-                onClick={() => navigate("/")}
-                style={{
-                    marginTop: "20px",
-                    padding: "10px 20px",
-                    backgroundColor: "#007BFF",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                }}
-            >
-                Връщане към вход
-            </button>
-            {message && <p style={{ marginTop: "20px", color: "red" }}>{message}</p>}
+                    <div className={`${styles.genresRow} ${styles.genresRow4}`}>
+                        {popularGenres.slice(5, 9).map((genre) => (
+                        <button
+                            key={genre}
+                            type="button"
+                            onClick={() => handleGenreSelect(genre)}
+                            className={
+                            formData.preferences.includes(genre)
+                                ? `${styles.genreButton} ${styles.selected}`
+                                : styles.genreButton
+                            }
+                        >
+                            {genre}
+                        </button>
+                        ))}
+                    </div>
+                    <div className={styles.buttonsRow}>
+                        <button type="submit" className={styles.registerButton}>
+                            Register
+                            </button>
+                            <button
+                            type="button"
+                            onClick={() => navigate("/")}
+                            className={styles.backButton}
+                            >
+                            Back to Home page
+                        </button>
+                    </div>
+                </form>
+                {message && <p style={{ marginTop: "20px", color: "red" }}>{message}</p>}
+            </div>
         </div>
     );
 };

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { applyActionCode, checkActionCode } from "firebase/auth";
-import { auth } from "../config/firebaseConfig"; // Adjust the path based on your file structure
+import { auth } from "../config/firebaseConfig.js";
 import axios from "axios";
 
 const EmailConfirmationPage = () => {
