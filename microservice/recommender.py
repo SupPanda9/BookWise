@@ -1,12 +1,15 @@
 import json
 import pika
 from sentence_transformers import SentenceTransformer, util
+from concurrent.futures import ThreadPoolExecutor
+import time
 
 class Recommender:
-    def __init__(self, google_books_client, text_processor):
+    def __init__(self, google_books_client, text_processor, max_workers=5):
         self.google_books_client = google_books_client
         self.text_processor = text_processor
         self.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+        self.executor = ThreadPoolExecutor(max_workers=max_workers)
 
     def get_recommendations(self, query, genres, read_books, max_requests=50):
         keywords = self.text_processor.extract_keywords(query)
@@ -16,20 +19,27 @@ class Recommender:
 
         recommendations = []
         request_count = 0
+        futures = []
+
+        def fetch_books(keyword, genre, start_index):
+            """Helper function to fetch books in parallel."""
+            search_query = f"{keyword} subject:{genre}"
+            books = self.google_books_client.search_books(search_query, max_results=10, start_index=start_index)
+            processed_books = self._process_books(books)
+            return self._filter_read_books(processed_books, read_books)
 
         for genre in genres:
             for keyword in keywords:
                 start_index = 0
                 while request_count < max_requests and len(recommendations) < 100:
-                    search_query = f"{keyword} subject:{genre}"
-                    books = self.google_books_client.search_books(search_query, max_results=10, start_index=start_index)
-                    processed_books = self._process_books(books)
-                    filtered_books = self._filter_read_books(processed_books, read_books)
-                    recommendations.extend(filtered_books)
+                    future = self.executor.submit(fetch_books, keyword, genre, start_index)
+                    futures.append(future)
                     start_index += 10
                     request_count += 1
-                    if not books:
-                        break
+                    time.sleep(0.2) 
+
+        for future in futures:
+            recommendations.extend(future.result())
 
         # Генериране на embeddings и изчисляване на сходство
         query_embedding = self.embedding_model.encode(query, convert_to_tensor=True)
@@ -47,6 +57,7 @@ class Recommender:
         results = []
         for book in books:
             volume_info = book.get("volumeInfo", {})
+            book_id = book.get("id", "Unknown ID")
             results.append({
                 "googleBooksId": book.get("id", "Unknown ID"),
                 "title": volume_info.get("title", "Unknown Title"),
@@ -55,29 +66,27 @@ class Recommender:
                 "description": volume_info.get("description", "No description available."),
                 "categories": volume_info.get("categories", []),
                 "thumbnail": volume_info.get("imageLinks", {}).get("thumbnail", ""),
-                "isbn": self._get_isbn(volume_info),
+                "isbn": self._get_isbn(volume_info, book_id),
                 "similarity": 0
             })
         return results
 
-    def _get_isbn(self, volume_info):
+    def _get_isbn(self, volume_info, book_id):
         identifiers = volume_info.get("industryIdentifiers", [])
         for identifier in identifiers:
             if identifier.get("type") == "ISBN_13":
                 return identifier.get("identifier")
-        return None
+        return book_id  # Ако няма ISBN, връща Google Books ID
 
     def _filter_read_books(self, books, read_books):
         if not read_books:
             print(" [!] No read books provided. Skipping filtering step.")
             return books
-        read_isbns = {book['isbn'] for book in read_books if book.get('isbn')}
-        read_titles = {book['title'] for book in read_books}
-        return [
-            book for book in books
-            if book['isbn'] not in read_isbns and book['title'] not in read_titles
-        ]
-    
+
+        read_ids = set(read_books)  # Списък от 'bookId' вече
+
+        return [book for book in books if book['googleBooksId'] not in read_ids]
+
     def send_recommendations(self, queue_name, recommendations, request_id):
         """Send recommendations to RabbitMQ with the requestId."""
         connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
@@ -108,17 +117,14 @@ def validate_payload(payload):
     if not isinstance(payload, dict):
         raise ValueError("Payload must be a dictionary.")
 
-    # Validate 'requestId'
     request_id = payload.get("requestId")
     if not request_id or not isinstance(request_id, str) or not request_id.strip():
         raise ValueError("RequestId must be a non-empty string.")
 
-    # Validate 'query'
     query = payload.get("query")
     if not query or not isinstance(query, str) or not query.strip():
         raise ValueError("Query must be a non-empty string.")
 
-    # Validate 'genres'
     genres = payload.get("genres", [])
     if not isinstance(genres, list) or not all(isinstance(genre, str) for genre in genres):
         raise ValueError("Genres must be a list of strings.")
@@ -126,19 +132,20 @@ def validate_payload(payload):
         print(" [!] Warning: 'genres' is empty. Defaulting to 'General'.")
         genres.append("General")
 
-    # Validate 'read_books'
     read_books = payload.get("read_books", [])
+
+    # 🔥 Отпечатваме структурата за дебъг
+    print(f" [DEBUG] Received read_books: {read_books}")
+
     if not isinstance(read_books, list) or not all(isinstance(book, dict) for book in read_books):
-        raise ValueError("Read books must be a list of dictionaries.")
+        raise ValueError("Read books must be a list of dictionaries with 'bookId' fields.")
 
-    # Optional: Validate each book's fields
     for book in read_books:
-        if "title" not in book or not isinstance(book["title"], str):
-            raise ValueError("Each book must have a valid 'title'.")
-        if "isbn" not in book or not isinstance(book["isbn"], str):
-            raise ValueError("Each book must have a valid 'isbn'.")
+        if "bookId" not in book or not isinstance(book["bookId"], str):
+            raise ValueError("Each book must have a valid 'bookId' as a string.")
 
-    # Return cleaned payload including requestId
-    return {"requestId": request_id, "query": query, "genres": genres, "read_books": read_books}
+    # Преобразуваме `read_books` в списък от `bookId` за по-лесно ползване по-нататък
+    read_books_ids = [book["bookId"] for book in read_books]
 
+    return {"requestId": request_id, "query": query, "genres": genres, "read_books": read_books_ids}
 
