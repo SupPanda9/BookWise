@@ -2,6 +2,7 @@ package com.bookwise.backend.service;
 
 import com.bookwise.backend.model.Book;
 import com.bookwise.backend.model.Collection;
+import com.bookwise.backend.model.User;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,6 +91,16 @@ public class CollectionService {
     }
 
     public void deleteCollection(String collectionId) throws Exception {
+        var collectionDoc = db.collection("collections").document(collectionId).get().get();
+        if (!collectionDoc.exists()) {
+            throw new Exception("Collection not found.");
+        }
+
+        Collection collection = collectionDoc.toObject(Collection.class);
+        if (collection != null && "Read".equals(collection.getName())) {
+            throw new Exception("The 'Read' collection cannot be deleted.");
+        }
+
         db.collection("collections").document(collectionId).delete().get();
     }
 
@@ -120,5 +131,81 @@ public class CollectionService {
             }
         }
         return books;
+    }
+
+    public void markBookAsRead(String userId, String bookId) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        var userDoc = db.collection("users").document(userId).get().get();
+        if (!userDoc.exists()) {
+            throw new Exception("User not found.");
+        }
+
+        User user = userDoc.toObject(User.class);
+        if (user == null) {
+            throw new Exception("Failed to fetch user data.");
+        }
+
+        // Ensure readBooks list exists
+        List<String> readBooks = user.getReadBooks();
+        if (!readBooks.contains(bookId)) {
+            readBooks.add(bookId);
+            user.setReadBooks(readBooks);
+            db.collection("users").document(userId).set(user);
+        }
+
+        // Ensure "Read" collection is updated
+        addBookToReadCollection(userId, bookId);
+    }
+
+    public void addBookToReadCollection(String userId, String bookId) throws Exception {
+        Collection readCollection = getOrCreateReadCollection(userId, db);
+        if (!readCollection.getBooks().contains(bookId)) {
+            readCollection.getBooks().add(bookId);
+            db.collection("collections").document(readCollection.getId()).set(readCollection);
+        }
+    }
+
+    private Collection getOrCreateReadCollection(String userId, Firestore db) throws Exception {
+        var querySnapshot = db.collection("collections")
+            .whereEqualTo("userId", userId)
+            .whereEqualTo("name", "Read")
+            .get()
+            .get();
+
+        if (querySnapshot.isEmpty()) {
+            Collection readCollection = new Collection();
+            readCollection.setId(UUID.randomUUID().toString());
+            readCollection.setUserId(userId);
+            readCollection.setName("Read");
+            readCollection.setPublic(false);
+            readCollection.setBooks(new ArrayList<>());
+            db.collection("collections").document(readCollection.getId()).set(readCollection).get();
+            return readCollection;
+        } else {
+            return querySnapshot.getDocuments().get(0).toObject(Collection.class);
+        }
+    }
+
+    public void unmarkBookAsRead(String userId, String bookId) throws Exception {
+        Firestore db = FirestoreClient.getFirestore();
+        var userDoc = db.collection("users").document(userId).get().get();
+        if (!userDoc.exists()) {
+            throw new Exception("User not found.");
+        }
+
+        User user = userDoc.toObject(User.class);
+        if (user == null) {
+            throw new Exception("Failed to fetch user data.");
+        }
+
+        // Remove book from readBooks
+        List<String> readBooks = user.getReadBooks();
+        readBooks.remove(bookId);
+        user.setReadBooks(readBooks);
+        db.collection("users").document(userId).set(user);
+
+        // Remove book from "Read" collection
+        Collection readCollection = getOrCreateReadCollection(userId, db);
+        removeBookFromCollection(readCollection.getId(), bookId);
     }
 }

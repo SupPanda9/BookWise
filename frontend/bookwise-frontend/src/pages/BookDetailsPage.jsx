@@ -20,6 +20,7 @@ const BookDetailsPage = () => {
     const [collections, setCollections] = useState([]); // Всички колекции на потребителя
     const [selectedCollections, setSelectedCollections] = useState(new Set()); // Избраните колекции
     const [newCollectionName, setNewCollectionName] = useState(""); // Име на новата колекция
+    const [isRead, setIsRead] = useState(false);
 
     useEffect(() => {
         const fetchBookDetails = async () => {
@@ -29,13 +30,16 @@ const BookDetailsPage = () => {
                 setError("Не сте влезли в системата.");
                 setLoading(false);
                 return;
-            }
+            }   
 
             try {
                 const response = await axios.get(`http://localhost:8080/books/${googleBooksId}`, {
                     params: { userId },
                 });
                 setBook(response.data);
+
+                const userResponse = await axios.get(`http://localhost:8080/users/${userId}`);
+                setIsRead(userResponse.data.readBooks.includes(googleBooksId));
 
                 // Зареждане на ревюта
                 const reviewsResponse = await axios.get(`http://localhost:8080/reviews/${googleBooksId}`);
@@ -59,6 +63,33 @@ const BookDetailsPage = () => {
 
         fetchBookDetails();
     }, [googleBooksId]);
+
+    const toggleReadStatus = async () => {
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            alert("Моля, влезте в профила си.");
+            return;
+        }
+    
+        try {
+            if (isRead) {
+                // Unmark book as read
+                await axios.delete(`http://localhost:8080/collections/users/${userId}/read`, {
+                    data: { bookId: googleBooksId },
+                });
+                setIsRead(false);
+            } else {
+                // Mark book as read
+                await axios.post(`http://localhost:8080/collections/users/${userId}/read`, {
+                    bookId: googleBooksId,
+                });
+                setIsRead(true);
+            }
+        } catch (err) {
+            console.error("Error updating read status:", err);
+            alert("Error updating read status.");
+        }
+    };
 
     const handleAddReview = async () => {
         const userId = localStorage.getItem("userId");
@@ -182,11 +213,14 @@ const BookDetailsPage = () => {
                 const response = await axios.get("http://localhost:8080/collections", {
                     params: { userId },
                 });
+
+                const filteredCollections = response.data.filter(collection => collection.name !== "Read");
     
-                setCollections(response.data);
-                const selected = response.data
+                setCollections(filteredCollections);
+                const selected = filteredCollections
                     .filter((collection) => collection.books.includes(googleBooksId))
                     .map((collection) => collection.id);
+                
                 setSelectedCollections(new Set(selected));
             } catch (err) {
                 console.error("Грешка при зареждане на колекции:", err);
@@ -291,6 +325,17 @@ const BookDetailsPage = () => {
             <p><strong>Страници:</strong> {book.pageCount}</p>
 
             <hr />
+
+            <button onClick={toggleReadStatus} style={{
+                padding: "10px 20px",
+                backgroundColor: isRead ? "#dc3545" : "#28a745", // Red for unmark, Green for mark
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+            }}>
+                {isRead ? "Remove from Read" : "Mark as Read"}
+            </button>
 
             <h2>Напишете ревю</h2>
             <textarea

@@ -3,7 +3,9 @@ package com.bookwise.backend.controller.collection;
 import com.bookwise.backend.model.Book;
 import com.bookwise.backend.model.Collection;
 import com.bookwise.backend.service.CollectionService;
+import com.bookwise.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -118,6 +120,36 @@ public class CollectionController {
             return ResponseEntity.ok("Collection deleted successfully.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/users/{userId}/read")
+    public ResponseEntity<?> markBookAsRead(@PathVariable String userId, @RequestBody Map<String, String> requestBody) {
+        String bookId = requestBody.get("bookId");
+        if (bookId == null || bookId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Book ID is required.");
+        }
+
+        try {
+            collectionService.markBookAsRead(userId, bookId);
+            return ResponseEntity.ok("Book marked as read.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/users/{userId}/read")
+    public ResponseEntity<?> unmarkBookAsRead(@PathVariable String userId, @RequestBody Map<String, String> requestBody) {
+        String bookId = requestBody.get("bookId");
+        if (bookId == null || bookId.isEmpty()) {
+            return ResponseEntity.badRequest().body("Book ID is required.");
+        }
+
+        try {
+            collectionService.unmarkBookAsRead(userId, bookId);
+            return ResponseEntity.ok("Book removed from read.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
 }

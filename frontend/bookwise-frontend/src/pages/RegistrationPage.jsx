@@ -78,7 +78,7 @@ const RegistrationPage = () => {
             await axios.post("http://localhost:8080/auth/send-confirmation", null, {
                 params: { email: formData.email },
             });
-            setMessage("Regiastration successful!");
+            setMessage("Registration successful!");
         } catch (error) {
             console.error("Registration error:", error);
             setMessage(error.response?.data || "Registration error.");

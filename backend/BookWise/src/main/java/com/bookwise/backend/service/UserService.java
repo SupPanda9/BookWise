@@ -59,6 +59,8 @@ public class UserService {
 
         FirestoreClient.getFirestore().collection("users").document(user.getId()).set(user).get();
 
+        getOrCreateReadCollection(user.getId(), db);
+
         // Create Firebase Auth user
         UserRecord.CreateRequest request = new UserRecord.CreateRequest()
             .setEmail(user.getEmail())

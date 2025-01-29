@@ -145,6 +145,8 @@ body, html {
     font-size: 1rem;
     background-color: #f4f2eb;
     color: #5C3D2E;
+
+    transition: all 0.3s ease-in-out;
 }
 
 .input:hover, input:focus {
