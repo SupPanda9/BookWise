@@ -1,0 +1,363 @@
+.book-details-container {
+    max-width: 60%; /* Свиване на контейнера */
+    margin: 20px auto;
+    padding: 30px;
+    background-color: #f4e8d5;
+    border-radius: 20px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+    font-family: "Playfair Display", serif;
+}
+
+/* Кафява кутия за заглавието - разширена да е от край до край */
+.book-title-container {
+    background-color: #5C3D2E;
+    padding: 20px;
+    border-radius: 15px;
+    text-align: left;
+    width: 100%;
+    display: flex;
+    justify-content: space-between; /* Pushes elements to left and right */
+    align-items: center;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* Анимация за заглавието */
+.book-title {
+    font-size: 2rem;
+    font-weight: bold;
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  
+        #ffcc00 45%,  
+        #ffd700 50%,  
+        #ffcc00 55%,  
+        #a67c00 90%   
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 10s infinite linear;
+}
+
+@keyframes shine {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+
+/* Разделяне на ляво и дясно */
+.book-details-content {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    align-items: start;
+}
+
+/* Лява колона */
+.book-info {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.book-info p {
+    color: #3c2a21; /* Тъмнокафяв цвят за добър контраст */
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+.book-info p strong {
+    color: #a67c00; /* Златисто-кафяво за подчертаване */
+}
+
+.book-description p {
+    color: #3c2a21; /* Тъмнокафяв цвят за добър контраст */
+    font-weight:normal;
+    font-size: 1rem;
+}
+
+.book-description p strong {
+    color: #a67c00; /* Златисто-кафяво за подчертаване */
+}
+
+
+/* Дясна колона */
+.book-description {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+    color: #3c2a21;
+    font-size: 1rem;
+}
+
+/* Среден рейтинг */
+.average-rating {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #a67c00;
+    text-align: center;
+}
+
+.rating-value {
+    font-size: 16px;
+    text-align: center;
+    color: #333;
+}
+
+/* Стилизиране на бутоните за Mark as Read и Add to Collection */
+.button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.read-button, .collection-button {
+    padding: 10px 15px;
+    font-size: 15px;
+    text-transform: uppercase;
+    background-color: #5C3D2E;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+}
+
+.read-button:hover, .collection-button:hover {
+    background-color: #a67c00;
+}
+
+.review-input {
+    width: 100%;
+}
+/* Поле за писане на ревю */
+.review-textarea {
+    width: 100%;
+    height: 100px;
+    border-radius: 5px;
+    padding: 10px;
+    border: none;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    resize: none;
+    box-sizing: border-box
+}
+
+/* Контейнер за ревюта */
+.review-list {
+    margin-top: 20px;
+}
+
+.review-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    color: #5C3D2E; /* Ensures text is readable */
+    margin: 10px 0;
+}
+
+.review-content p {
+    color: #5C3D2E; /* Apply color to text inside reviews */
+    font-size: 16px;
+    line-height: 1.4;
+}
+
+/* Бутон за добавяне на ревю */
+.submit-review {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #5C3D2E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin: 10px 0;
+}
+
+.submit-review:hover {
+    background-color: #a67c00;
+}
+
+.edit-review {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #5C3D2E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin: 10px 10px;
+}
+
+.edit-review:hover {
+    background-color: #a67c00;
+}
+
+.delete-review {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin: 10px 10px;
+}
+
+.delete-review:hover {
+    background-color: #a67c00;
+}
+
+/* Стилизиране на звездите */
+.rating-buttons {
+    display: flex;
+    justify-content: left;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.star-button {
+    background: none;
+    border: none;
+    font-size: 40px;
+    cursor: pointer;
+    color: #5C3D2E;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.star-button.selected {
+    font-weight: bold;
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  
+        #ffcc00 45%,  
+        #ffd700 50%,  
+        #ffcc00 55%,  
+        #a67c00 90%   
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 2s infinite linear;
+}
+
+.star-button:hover {
+    transform: scale(1.2);
+}
+
+.edit-textarea {
+    width: 100%;
+    height: 100px;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 14px;
+    background: #fff;
+    color: #333;
+    resize: none;
+    box-sizing: border-box
+}
+
+.save-edit, .cancel-edit {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #5C3D2E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin: 10px 10px;
+}
+
+.save-edit:hover, .cancel-edit:hover {
+    background-color: #a67c00;
+}
+
+/* Бутон за зареждане на още ревюта */
+.load-more {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #5C3D2E;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    margin: 10px 0px;
+}
+
+.load-more:hover {
+    background-color: #a67c00;
+}
+
+/* Медиа заявки за мобилни устройства */
+@media screen and (max-width: 768px) {
+    .book-details-content {
+        grid-template-columns: 1fr;
+    }
+
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+.book-details-container h2 {
+    text-align: left;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #5C3D2E;
+}
+
+.backButton {
+    font-size: 1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.5s ease-in-out;
+    
+    /* Gold Shine Effect */
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  
+        #ffcc00 45%,  
+        #ffd700 50%,  
+        #ffcc00 55%,  
+        #a67c00 90%   
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shineHover 1s linear;
+}
+
+.backButton:hover {
+    animation: none; /* Stops ongoing animation */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transform: scale(1.1);
+    animation: shineHover 1s infinite linear;
+}
+
+@keyframes shineHover {
+    0% { background-position: 100% center; }
+    100% { background-position: -100% center; }
+}

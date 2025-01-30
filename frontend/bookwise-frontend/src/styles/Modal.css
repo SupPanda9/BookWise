@@ -1,21 +1,154 @@
-.modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    z-index: 1000;
-    width: 400px;
+/* Prevent background scrolling */
+body.modal-open {
+    overflow: hidden;
 }
+
+/* MODAL OVERLAY */
 .modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.6); /* Darker background for a smoother look */
     z-index: 999;
+}
+
+/* MODAL STYLING */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #f4e8d5; /* Soft beige background */
+    padding: 30px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 15px;
+    z-index: 1000;
+    
+    width: 50vw;  /* Ensures a good size */
+    min-width: 500px;  /* Prevents it from being too small */
+    max-width: 80vw; /* Limits it on large screens */
+    
+    min-height: 300px;  /* Ensures content is readable */
+    max-height: 80vh; /* Limits max size */
+    
+    overflow-y: auto; /* Allow vertical scrolling if needed */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    
+    border: 2px solid #5C3D2E; /* Soft brown border */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    animation: fadeIn 0.3s ease-out;
+    box-sizing: border-box;
+}
+
+/* MODAL HEADER */
+.modal h4 {
+    text-align: center;
+    font-size: 22px;
+    color: #5C3D2E;
+    margin-bottom: 15px;
+}
+
+.modal h3 {
+    text-align: center;
+    font-size: 22px;
+    color: #5C3D2E;
+    padding: 15px 0; /* Add spacing above and below */
+}
+
+/* COLLECTION LIST */
+.collection-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+    max-width: 100%;
+}
+
+/* COLLECTION ITEM BUTTONS */
+.collection-item {
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #5C3D2E;
+    border: 2px solid #5C3D2E;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.collection-item.selected {
+    background-color: #a67c00;
+    color: white;
+}
+
+.collection-item:hover {
+    background-color: #5C3D2E;
+    color: white;
+    transform: scale(1.05);
+}
+
+/* COLLECTION INPUT FIELD */
+.collection-input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 2px solid #5C3D2E;
+    border-radius: 8px;
+    background: white;
+    color: #3c2a21;
+    outline: none;
+    transition: border 0.3s ease-in-out;
+}
+
+.collection-input:focus {
+    border-color: #a67c00; /* Golden focus */
+}
+
+/* BUTTON STYLING */
+.create-collection, .close-modal {
+    display: inline-block;
+    padding: 12px 18px;
+    font-size: 16px;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-color: #5C3D2E;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out, transform 0.2s ease-in-out;
+    margin-top: 15px;
+}
+
+.create-collection:hover, .close-modal:hover {
+    background-color: #a67c00;
+    transform: scale(1.05);
+}
+
+/* FLEXBOX FOR BUTTON ALIGNMENT */
+.modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* MODAL OPEN ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -55%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+@media screen and (max-width: 400px) {
+    .modal {
+        width: 90vw;
+        min-width: unset;
+        top: 10vh;
+        transform: translate(-50%, 0);
+    }
 }

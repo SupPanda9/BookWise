@@ -80,7 +80,7 @@ body, html {
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shine 10s infinite linear;
+    animation: shineHover 1s linear;
 }
 
 /* 🔥 Hover Effect */

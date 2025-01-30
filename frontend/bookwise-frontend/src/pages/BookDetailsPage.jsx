@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+import styles from "../styles/BookDetails.module.css";
 import "../styles/Modal.css";
+import { useNavigate } from "react-router-dom";
 
 const BookDetailsPage = () => {
+    const navigate = useNavigate();
+
     const { googleBooksId } = useParams();
     const [book, setBook] = useState(null);
     const [reviews, setReviews] = useState([]); // Списък с ревюта
@@ -149,11 +153,7 @@ const BookDetailsPage = () => {
         setEditedText(review.text); // Задаваме текста
         setEditedRating(review.rating); // Задаваме рейтинга
     };
-    
-    const toggleModal = () => {
-        setShowModal(!showModal);
-    };    
-    
+
     const submitEditReview = async () => {
         try {
             await axios.put(`http://localhost:8080/reviews/${googleBooksId}/${editingReview}`, {
@@ -229,6 +229,18 @@ const BookDetailsPage = () => {
     
         if (showModal) fetchCollections();
     }, [showModal, googleBooksId]);
+
+    const toggleModal = () => {
+        setShowModal(!showModal);
+    };    
+    
+    useEffect(() => {
+        if (showModal) {
+            document.body.classList.add("modal-open");
+        } else {
+            document.body.classList.remove("modal-open");
+        }
+    }, [showModal]);
 
     const toggleCollection = async (collectionId, isSelected) => {
         try {
@@ -306,216 +318,111 @@ const BookDetailsPage = () => {
         }
     };
 
-    if (loading) return <p>Зареждане...</p>;
+    if (loading) return <p>Loading...</p>;
     if (error) return <p style={{ color: "red" }}>{error}</p>;
 
     return (
-        <div style={{ padding: "20px" }}>
+        <div className={styles["book-details-container"]}>
+            <div className={styles["book-title-container"]}>
+                <h1 className={styles["book-title"]}>{book?.title}</h1>
+                
+                {/* Back Button */}
+                <button className={styles.backButton} onClick={() => navigate(-1)}>
+                    Back
+                </button>
+            </div>
 
-            <h1>{book.title}</h1>
-            <img src={book.coverImage} alt={book.title} style={{ width: "300px", height: "450px", objectFit: "cover" }} />
-            <h2>Среден рейтинг</h2>
-            <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-                {reviews.length === 0 ? "Няма достатъчно данни" : `${calculateAverageRating()} / 5`}
-            </p>
-            <hr />
-            <p><strong>Автори:</strong> {book.authors.join(", ")}</p>
-            <p><strong>Жанрове:</strong> {book.genres.join(", ")}</p>
-            <p><strong>Описание:</strong> {book.description}</p>
-            <p><strong>Страници:</strong> {book.pageCount}</p>
+            <div className={styles["book-details-content"]}>
+                {/* Лява колона */}
+                <div className={styles["book-info"]}>
+                    <img className={styles["book-cover"]} src={book?.coverImage} alt={book?.title} />
+                    <p><strong>Rating:</strong> {reviews.length === 0 ? "Няма достатъчно данни" : `${calculateAverageRating()} / 5`}</p>
+                    <p><strong>Authors:</strong> {book?.authors?.join(", ")}</p>
+                    <p><strong>Genres:</strong> {book?.genres?.join(", ")}</p>
+                    <p><strong>Page count:</strong> {book?.pageCount}</p>
 
-            <hr />
+                    <div className={styles["button-container"]}>
+                        <button className={`${styles["read-button"]} ${isRead ? "read" : "unread"}`} onClick={toggleReadStatus}>
+                            {isRead ? "Remove from Read" : "Mark as Read"}
+                        </button>
 
-            <button onClick={toggleReadStatus} style={{
-                padding: "10px 20px",
-                backgroundColor: isRead ? "#dc3545" : "#28a745", // Red for unmark, Green for mark
-                color: "#fff",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-            }}>
-                {isRead ? "Remove from Read" : "Mark as Read"}
-            </button>
+                        <button className={styles["collection-button"]} onClick={toggleModal}>Add to Collections</button>
+                        {showModal && (
+                            <>
+                                <div className="modal-overlay" onClick={toggleModal}>
+                                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                                        <h3>Manage Collections</h3>
+                                        <div className="collection-list">
+                                            {collections.map((collection) => (
+                                                <button key={collection.id} className={`collection-item ${selectedCollections.has(collection.id) ? "selected" : ""}`} onClick={() => toggleCollection(collection.id, !selectedCollections.has(collection.id))}>
+                                                    {collection.name || "Без име"}
+                                                </button>
+                                            ))}
+                                        </div>
+                                        <hr />
+                                        <h4>Create New Collection</h4>
+                                        <input className="collection-input" type="text" value={newCollectionName} onChange={(e) => setNewCollectionName(e.target.value)} placeholder="Collection Name" />
+                                        <div className="modal-buttons">
+                                            <button className="create-collection">Create</button>
+                                            <button className="close-modal" onClick={toggleModal}>Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </>
+                        )}
+                    </div>
+                </div>
+                
+                {/* Дясна колона */}
+                <div className={styles["book-description"]}>
+                    <p><strong>Description:</strong> {book?.description}</p>
+                </div>
+            </div>
 
-            <h2>Напишете ревю</h2>
-            <textarea
-                placeholder="Напишете вашето ревю..."
-                value={newReview}
-                onChange={(e) => setNewReview(e.target.value)}
-                style={{ width: "100%", height: "100px", marginBottom: "10px" }}
-            />
-            <div>
+            <h2>Write Review</h2>
+            <div className={styles["rating-buttons"]}>
                 {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                        key={star}
+                    <button 
+                        key={star} 
+                        className={`${styles["star-button"]} ${rating >= star ? styles["selected"] : ""}`} 
                         onClick={() => setRating(star)}
-                        style={{
-                            padding: "10px",
-                            marginRight: "5px",
-                            backgroundColor: rating >= star ? "#FFD700" : "#ccc",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                        }}
                     >
                         ★
                     </button>
                 ))}
             </div>
-            <button
-                onClick={handleAddReview}
-                style={{
-                    marginTop: "10px",
-                    padding: "10px 20px",
-                    backgroundColor: "#28a745",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "5px",
-                    cursor: "pointer",
-                }}
-            >
-                Добави ревю
-            </button>
+            <div className={styles["review-input"]}>
+                <textarea className={styles["review-textarea"]} placeholder="Write your review..." value={newReview} onChange={(e) => setNewReview(e.target.value)} />
+            </div>
+            <button className={styles["submit-review"]} onClick={handleAddReview}>Add Review</button>
 
-            <button onClick={toggleModal}>Добави към колекции</button>
-            {showModal && ( // Тук започва модалът
-                <>
-                    <div className="modal-overlay" onClick={toggleModal}></div>
-                    <div className="modal">
-                        <h3>Управление на колекции</h3>
-                        <div>
-                            {collections.map((collection) => (
-                                <button
-                                    key={collection.id}
-                                    onClick={() => toggleCollection(collection.id, !selectedCollections.has(collection.id))}
-                                    style={{
-                                        padding: "10px 20px",
-                                        margin: "5px 0",
-                                        backgroundColor: selectedCollections.has(collection.id) ? "#007BFF" : "#fff",
-                                        color: selectedCollections.has(collection.id) ? "#fff" : "#000",
-                                        border: "1px solid #ccc",
-                                        borderRadius: "5px",
-                                        cursor: "pointer",
-                                        textAlign: "center",
-                                        display: "block",
-                                    }}
-                                >
-                                    {collection.name || "Без име"}
-                                </button>
-                            ))}
-                        </div>
-                        <hr />
-                        <h4>Създай нова колекция</h4>
-                        <input
-                            type="text"
-                            value={newCollectionName}
-                            onChange={(e) => setNewCollectionName(e.target.value)}
-                            placeholder="Име на колекцията"
-                        />
-                        <button onClick={createCollection}>Създай</button>
-                        <button onClick={toggleModal}>Затвори</button>
-                    </div>
-                </>
-            )}
-
-
-            <h2>Ревюта</h2>
-            <div>
+            <h2>Reviews</h2>
+            <div className={styles["review-list"]}>
                 {reviews.length === 0 ? (
-                    <p>Няма намерени ревюта за тази книга.</p>
+                    <p>No reviews found for this book. You can leave one :)</p>
                 ) : (
-                    reviews.slice(0, visibleReviews).map((review, index) => (
-                        <div key={index} style={{ borderBottom: "1px solid #ccc", marginBottom: "10px" }}>
-                            {editingReview === review.id ? ( // Режим на редакция
+                    reviews.slice(0, visibleReviews).map((review) => (
+                        <div key={review.id} className={styles["review-card"]}>
+                            {editingReview === review.id ? (
                                 <div>
-                                    <textarea
-                                        value={editedText}
-                                        onChange={(e) => setEditedText(e.target.value)} // Променяме текста
-                                        style={{ width: "100%", height: "100px", marginBottom: "10px" }}
-                                    />
-                                    <div>
+                                    <textarea className={styles["edit-textarea"]} value={editedText} onChange={(e) => setEditedText(e.target.value)} />
+                                    <div className={styles["edit-rating"]}>
                                         {[1, 2, 3, 4, 5].map((star) => (
-                                            <button
-                                                key={star}
-                                                onClick={() => setEditedRating(star)} // Променяме рейтинга
-                                                style={{
-                                                    padding: "10px",
-                                                    marginRight: "5px",
-                                                    backgroundColor: editedRating >= star ? "#FFD700" : "#ccc",
-                                                    border: "none",
-                                                    borderRadius: "5px",
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                ★
-                                            </button>
+                                            <button key={star} className={`${styles["star-button"]} ${editedRating >= star ? styles["selected"] : ""}`} onClick={() => setEditedRating(star)}>★</button>
                                         ))}
                                     </div>
-                                    <button
-                                        onClick={submitEditReview} // Изпращаме редакцията
-                                        style={{
-                                            marginTop: "10px",
-                                            padding: "10px 20px",
-                                            backgroundColor: "#28a745",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "5px",
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        Запази
-                                    </button>
-                                    <button
-                                        onClick={() => setEditingReview(null)} // Излизане от редакция
-                                        style={{
-                                            marginTop: "10px",
-                                            padding: "10px 20px",
-                                            backgroundColor: "#dc3545",
-                                            color: "#fff",
-                                            border: "none",
-                                            borderRadius: "5px",
-                                            cursor: "pointer",
-                                        }}
-                                    >
-                                        Отказ
-                                    </button>
+                                    <button className={styles["save-edit"]} onClick={submitEditReview}>Запази</button>
+                                    <button className={styles["cancel-edit"]} onClick={() => setEditingReview(null)}>Отказ</button>
                                 </div>
-                            ) : ( // Обикновен режим
-                                <div>
-                                    <p><strong>Рейтинг:</strong> {review.rating} звезди</p>
+                            ) : (
+                                <div className={styles["review-content"]}>
+                                    <p><strong>Rating:</strong> {review.rating} ★</p>
                                     <p>{review.text}</p>
-                                    <p style={{ fontStyle: "italic", color: "#666" }}>
-                                        Написано на: {formatTimestamp(review.timestamp)}
-                                    </p>
-                                    {localStorage.getItem("userId") === review.userId && ( // Ако ревюто е на текущия потребител
-                                        <div>
-                                            <button
-                                                onClick={() => handleEditReview(review)} // Стартиране на редакция
-                                                style={{
-                                                    marginRight: "10px",
-                                                    padding: "5px 10px",
-                                                    backgroundColor: "#007BFF",
-                                                    color: "#fff",
-                                                    border: "none",
-                                                    borderRadius: "5px",
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Редактиране
-                                            </button>
-                                            <button
-                                                onClick={() => handleDeleteReview(review.id)} // Изтриване на ревю
-                                                style={{
-                                                    padding: "5px 10px",
-                                                    backgroundColor: "#dc3545",
-                                                    color: "#fff",
-                                                    border: "none",
-                                                    borderRadius: "5px",
-                                                    cursor: "pointer",
-                                                }}
-                                            >
-                                                Изтриване
-                                            </button>
+                                    <p className={styles["review-timestamp"]}>Written on: {formatTimestamp(review.timestamp)}</p>
+                                    {localStorage.getItem("userId") === review.userId && (
+                                        <div className={styles["review-actions"]}>
+                                            <button className={styles["edit-review"]} onClick={() => handleEditReview(review)}>Edit</button>
+                                            <button className={styles["delete-review"]} onClick={() => handleDeleteReview(review.id)}>Delete</button>
                                         </div>
                                     )}
                                 </div>
@@ -523,23 +430,10 @@ const BookDetailsPage = () => {
                         </div>
                     ))
                 )}
-                {reviews.length > visibleReviews && ( // Бутон "Зареди още"
-                    <button
-                        onClick={() => setVisibleReviews((prev) => prev + 5)}
-                        style={{
-                            padding: "10px",
-                            backgroundColor: "#007BFF",
-                            color: "#fff",
-                            border: "none",
-                            borderRadius: "5px",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Зареди още
-                    </button>
+                {reviews.length > visibleReviews && (
+                    <button className={styles["load-more"]} onClick={() => setVisibleReviews((prev) => prev + 5)}>Load more</button>
                 )}
             </div>
-
         </div>
     );
 };

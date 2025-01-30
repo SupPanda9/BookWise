@@ -98,7 +98,7 @@ body, html {
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shineButton 1s ease-in-out;
+    animation: shineHover 1.5s ease-in-out;
 }
 
 /*  Hover Effect - Restart Animation */
