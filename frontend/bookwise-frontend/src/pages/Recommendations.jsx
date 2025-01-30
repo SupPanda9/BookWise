@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "./api";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Recommendations.module.css";
 
@@ -30,7 +30,7 @@ const Recommendations = () => {
         setError("");
 
         try {
-            const response = await axios.post(`http://localhost:8080/recommendations/${userId}`, {
+            const response = await api.post(`/recommendations/${userId}`, {
                 query,
                 genres: genres.split(",").map((genre) => genre.trim()),
             });

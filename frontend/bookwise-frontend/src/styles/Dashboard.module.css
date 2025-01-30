@@ -2,7 +2,7 @@
 body, html {
     margin: 0;
     padding: 0;
-    width: 100%;
+    width: 100vw;
     min-height: 100vh; /* Ensure the background covers full height */
     background-color: #f4e8d5;
     display: flex;
@@ -21,7 +21,8 @@ body, html {
     max-width: 1200px;
     margin: 0 auto;
     border-radius: 15px;
-    padding: 25px;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 /* Gold Shine Animation */
@@ -37,7 +38,7 @@ body, html {
 
 /* Navbar */
 .navbar {
-    width: 95%;
+    width: 100%;
     max-width: 1200px;
     background-color: #5C3D2E; /* Rich brown */
     padding: 15px;
@@ -47,6 +48,8 @@ body, html {
     border-radius: 15px; /* Curved edges */
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease-in-out;
+    box-sizing: border-box;
+    margin: 0px 20px;
 }
 
 /* BookWise Logo - Infinite Shine */

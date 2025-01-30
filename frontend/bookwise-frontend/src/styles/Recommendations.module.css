@@ -2,7 +2,7 @@
 body, html {
     margin: 0;
     padding: 0;
-    width: 100%;
+    width: 100vw;
     min-height: 100vh; /* Ensure the background covers full height */
     background-color: #f4e8d5;
     display: flex;
@@ -22,6 +22,7 @@ body, html {
     margin: 0 auto;
     border-radius: 15px;
     padding: 25px;
+    box-sizing: border-box;
 }
 
 /* Хедър */

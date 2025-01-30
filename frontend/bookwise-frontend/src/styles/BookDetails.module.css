@@ -346,7 +346,7 @@
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: shineHover 1s linear;
+    animation: shineHover 1.5s linear;
 }
 
 .backButton:hover {

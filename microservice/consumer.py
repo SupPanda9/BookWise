@@ -25,6 +25,10 @@ def process_request(payload):
         genres = validated_payload["genres"]
         read_books = validated_payload["read_books"]
 
+        print(f"🔹 Received Query: {query}")
+        print(f"🔹 Received Genres: {genres}")
+        print(f"🔹 Received Read Books: {read_books}")
+
         print(f" [x] Processing request {request_id} in thread {threading.current_thread().name}")
 
         recommendations = recommender.get_recommendations(query, genres, read_books)

@@ -16,8 +16,21 @@ class GoogleBooksClient:
             "startIndex": start_index,
             "key": self.API_KEY
         }
-        response = requests.get(self.BASE_URL, params=params)
-        if response.status_code == 200:
-            return response.json().get("items", [])
-        else:
-            raise Exception(f"Google Books API error: {response.status_code}")
+        print(f"🔍 Searching Google Books API with query: {query}")
+
+        try:
+            response = requests.get(self.BASE_URL, params=params)
+            response.raise_for_status()  # Проверкa за HTTP грешки
+            data = response.json()  # Опитваме се да декодираме JSON
+
+            if not isinstance(data, dict) or "items" not in data:
+                print(f"❌ Unexpected API response format: {data}")
+                return []  # Връщаме празен списък, вместо невалидни данни
+
+            books = data.get("items", [])
+            print(f"✅ Found {len(books)} books for query: {query}")
+            return books if isinstance(books, list) else []  # Уверяваме се, че books е списък
+
+        except requests.exceptions.RequestException as e:
+            print(f"❌ Google Books API request failed: {e}")
+            return []  # Връщаме празен списък при грешка

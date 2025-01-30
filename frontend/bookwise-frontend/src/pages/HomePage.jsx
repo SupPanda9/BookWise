@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "./api";
 import styles from "../styles/HomePage.module.css"; 
 
 const HomePage = () => {
@@ -19,14 +19,17 @@ const HomePage = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post("http://localhost:8080/auth/login", formData, {
+            const response = await api.post("/auth/login", formData, {
                 headers: {
                     "Content-Type": "application/json",
                 },
             });
 
-            localStorage.setItem("userId", response.data.userId);
-            localStorage.setItem("token", response.data.token);
+            const token = response.data.token;
+            if (token) {
+                localStorage.setItem("jwtToken", token);
+                localStorage.setItem("userId", response.data.userId);
+            }
             setMessage("Successfully logged in!");
 
             // Пренасочване към Dashboard

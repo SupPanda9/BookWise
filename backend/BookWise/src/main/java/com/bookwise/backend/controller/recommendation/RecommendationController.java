@@ -1,7 +1,11 @@
 package com.bookwise.backend.controller.recommendation;
 
 import com.bookwise.backend.service.RecommendationService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.concurrent.CompletableFuture;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/recommendations")
@@ -28,7 +31,8 @@ public class RecommendationController {
     public CompletableFuture<ResponseEntity<String>> getRecommendations(@PathVariable String userId,
                                                                         @RequestBody Map<String, Object> userRequest) {
         try {
-            // Prepare payload for RabbitMQ
+            SecurityContext securityContext = SecurityContextHolder.getContext(); // ✅ Preserve authentication context
+
             Map<String, Object> payload = new HashMap<>();
             payload.put("userId", userId);
             payload.put("query", userRequest.get("query"));
@@ -37,35 +41,16 @@ public class RecommendationController {
             payload.put("requestId", recommendationService.generateRequestId(userId));
 
             return recommendationService.getRecommendationsForUserAsync(userId, payload)
-                .thenApply(recommendationsJson -> ResponseEntity.ok(recommendationsJson))
-                .exceptionally(e -> {
-                    // Convert the error response to a JSON string
-                    Map<String, String> errorResponse = Map.of(
-                        "error", "Error fetching recommendations",
-                        "details", e.getMessage()
-                    );
-                    String errorJson;
-                    try {
-                        errorJson = new ObjectMapper().writeValueAsString(errorResponse);
-                    } catch (Exception ex) {
-                        errorJson = "{\"error\":\"Failed to serialize error message\"}";
-                    }
-                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorJson);
+                .thenApply(recommendationsJson -> {
+                    SecurityContextHolder.setContext(securityContext); // ✅ Restore authentication
+                    System.out.println("✅ Sending response to frontend: " + recommendationsJson);
+                    return ResponseEntity.ok(recommendationsJson);
                 });
         } catch (Exception e) {
-            // Convert the immediate error to a JSON string
-            Map<String, String> errorResponse = Map.of(
-                "error", "Error processing request",
-                "details", e.getMessage()
-            );
-            String errorJson;
-            try {
-                errorJson = new ObjectMapper().writeValueAsString(errorResponse);
-            } catch (Exception ex) {
-                errorJson = "{\"error\":\"Failed to serialize error message\"}";
-            }
+            System.err.println("❌ Immediate error processing request: " + e.getMessage());
             return CompletableFuture.completedFuture(
-                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorJson)
+                ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("{\"error\": \"Failed to process request\"}")
             );
         }
     }

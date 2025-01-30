@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import axios from "axios";
+import React, { useState, useEffect } from "react";
+import api from "./api";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/RegistrationPage.module.css";
 
@@ -9,54 +9,34 @@ const RegistrationPage = () => {
         username: "",
         email: "",
         password: "",
-        preferences: [], // Списък от избрани жанрове
+        preferences: [], // List of selected genres
     });
     const [message, setMessage] = useState("");
+    const [isSuccess, setIsSuccess] = useState(false); // Track success for redirection
 
-    // Списък с популярни жанрове
     const popularGenres = [
-        "Fantasy",
-        "Science Fiction",
-        "Mystery",
-        "Thriller",
-        "Romance",
-        "Horror",
-        "Adventure",
-        "Biography",
-        "Historical",
+        "Fantasy", "Science Fiction", "Mystery", "Thriller", 
+        "Romance", "Horror", "Adventure", "Biography", "Historical"
     ];
 
-    // Обработва промяната в текстовите полета
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    // Обработва избора на жанрове
     const handleGenreSelect = (genre) => {
         setFormData((prevData) => {
-            console.log(prevData.preferences);
             if (prevData.preferences.includes(genre)) {
-                // Премахва жанра, ако вече е избран
-                return {
-                    ...prevData,
-                    preferences: prevData.preferences.filter((g) => g !== genre),
-                };
+                return { ...prevData, preferences: prevData.preferences.filter((g) => g !== genre) };
             } else {
-                // Добавя жанра, ако не е избран
-                return {
-                    ...prevData,
-                    preferences: [...prevData.preferences, genre],
-                };
+                return { ...prevData, preferences: [...prevData.preferences, genre] };
             }
         });
     };
 
-    // Обработва изпращането на формата
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Създаване на обект `preferences` за бекенда
         const payload = {
             username: formData.username,
             email: formData.email,
@@ -64,24 +44,29 @@ const RegistrationPage = () => {
             preferences: {
                 genres: formData.preferences.map((genre) => ({
                     genre,
-                    lastActive: new Date().toISOString(), // Добавя текущата дата
+                    lastActive: new Date().toISOString(),
                 })),
             },
         };
 
         try {
-            const response = await axios.post("http://localhost:8080/auth/register", payload, {
-                headers: {
-                    "Content-Type": "application/json",
-                },
+            await api.post("/auth/register", payload, {
+                headers: { "Content-Type": "application/json" },
             });
-            await axios.post("http://localhost:8080/auth/send-confirmation", null, {
+
+            await api.post("/auth/send-confirmation", null, {
                 params: { email: formData.email },
             });
-            setMessage("Registration successful!");
+
+            setMessage("🎉 Registration successful! Redirecting to homepage...");
+            setIsSuccess(true);
+
+            // Redirect after 5 seconds
+            setTimeout(() => navigate("/"), 5000);
         } catch (error) {
             console.error("Registration error:", error);
             setMessage(error.response?.data || "Registration error.");
+            setIsSuccess(false);
         }
     };
 
@@ -97,7 +82,6 @@ const RegistrationPage = () => {
                             onChange={handleChange}
                             value={formData.username}
                             required
-                            style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
                         />
                     </div>
                     <div className={styles.inputRow}>
@@ -108,7 +92,6 @@ const RegistrationPage = () => {
                             onChange={handleChange}
                             value={formData.email}
                             required
-                            style={{ padding: "10px", marginBottom: "10px", width: "100%" }}
                         />
                     </div>
                     <div className={styles.inputRow}>
@@ -119,10 +102,10 @@ const RegistrationPage = () => {
                             onChange={handleChange}
                             value={formData.password}
                             required
-                            style={{ padding: "10px", marginBottom: "20px", width: "100%" }}
                         />
                     </div>
-                    <div className={styles.genresTitle}>Choose preferred genres: </div>
+
+                    <div className={styles.genresTitle}>Choose preferred genres:</div>
                     <div className={`${styles.genresRow} ${styles.genresRow5}`}>
                         {popularGenres.slice(0, 5).map((genre) => (
                             <button
@@ -141,34 +124,34 @@ const RegistrationPage = () => {
                     </div>
                     <div className={`${styles.genresRow} ${styles.genresRow4}`}>
                         {popularGenres.slice(5, 9).map((genre) => (
-                        <button
-                            key={genre}
-                            type="button"
-                            onClick={() => handleGenreSelect(genre)}
-                            className={
-                            formData.preferences.includes(genre)
-                                ? `${styles.genreButton} ${styles.selected}`
-                                : styles.genreButton
-                            }
-                        >
-                            {genre}
-                        </button>
+                            <button
+                                key={genre}
+                                type="button"
+                                onClick={() => handleGenreSelect(genre)}
+                                className={
+                                    formData.preferences.includes(genre)
+                                        ? `${styles.genreButton} ${styles.selected}`
+                                        : styles.genreButton
+                                }
+                            >
+                                {genre}
+                            </button>
                         ))}
                     </div>
+
                     <div className={styles.buttonsRow}>
-                        <button type="submit" className={styles.registerButton}>
-                            Register
-                            </button>
-                            <button
-                            type="button"
-                            onClick={() => navigate("/")}
-                            className={styles.backButton}
-                            >
-                            Back to Home page
+                        <button type="submit" className={styles.registerButton}>Register</button>
+                        <button type="button" onClick={() => navigate("/")} className={styles.backButton}>
+                            Back to Home Page
                         </button>
                     </div>
                 </form>
-                {message && <p style={{ marginTop: "20px", color: "red" }}>{message}</p>}
+
+                {message && (
+                    <p className={`${styles.message} ${isSuccess ? styles.success : styles.error}`}>
+                        {message}
+                    </p>
+                )}
             </div>
         </div>
     );

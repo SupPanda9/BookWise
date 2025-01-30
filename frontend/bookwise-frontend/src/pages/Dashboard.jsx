@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
+import api from "./api";
 import { useNavigate } from "react-router-dom";
 import styles from "../styles/Dashboard.module.css";
 
@@ -11,6 +11,7 @@ const Dashboard = () => {
     const [error, setError] = useState("");
     const [showDropdown, setShowDropdown] = useState(false);
     const searchRef = useRef(null); // Track search container
+    const debounceTimeout = useRef(null); // Ref for debounce timer
 
     // Detect clicks outside search container
     useEffect(() => {
@@ -24,9 +25,19 @@ const Dashboard = () => {
     }, []);
 
     const handleInputChange = (e) => {
-        setQuery(e.target.value);
+        const searchTerm = e.target.value;
+        setQuery(searchTerm);
         setShowDropdown(true); // Show dropdown when typing
-        fetchBooks(e.target.value);
+
+        // Clear any previous debounce timer
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+
+        // Set a new timer to wait 2 seconds before making the request
+        debounceTimeout.current = setTimeout(() => {
+            fetchBooks(searchTerm);
+        }, 2000); // ⏳ Wait for 2 seconds
     };
 
     const fetchBooks = async (searchTerm) => {
@@ -39,7 +50,7 @@ const Dashboard = () => {
         setError("");
 
         try {
-            const response = await axios.get("http://localhost:8080/books/search", {
+            const response = await api.get("/books/search", {
                 params: { query: searchTerm, maxResults: 5, sort: "popularity" },
             });
             setBooks(response.data);
@@ -57,6 +68,15 @@ const Dashboard = () => {
         setShowDropdown(false); // Hide dropdown after selection
     };
 
+    const handleLogout = () => {
+        console.log("🔴 Logging out...");
+        localStorage.removeItem("jwtToken"); // ✅ Remove expired token
+        localStorage.removeItem("userId");
+        sessionStorage.clear(); // ✅ Ensure session storage is cleared
+        navigate("/"); // ✅ Redirect to login page
+        window.location.reload(); // ✅ Force reload to clear all cached state
+    };
+
     return (
         <div className={styles.pageWrapper}>
             <nav className={styles.navbar}>
@@ -66,11 +86,7 @@ const Dashboard = () => {
                     <button onClick={() => navigate("/collections")}>Collections</button>
                     <button onClick={() => navigate("/profile")}>Profile</button>
                     <button onClick={() => navigate("/challenges")}>Challenges</button>
-                    <button onClick={() => {
-                        localStorage.removeItem("token");
-                        localStorage.removeItem("userId");
-                        navigate("/");
-                    }} className={styles.logoutButton}>Logout</button>
+                    <button onClick={handleLogout} className={styles.logoutButton}>Logout</button>
                 </div>
             </nav>
 

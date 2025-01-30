@@ -127,7 +127,6 @@
   .selected {
     background-color: #8C624A;
     border: 2px solid #fff;
-    font-weight: bold;
   }
   
   /* Ред за бутоните "Регистрация" и "Връщане назад" */
@@ -155,18 +154,23 @@
     background-color: #704D33; /* По-тъмен при hover */
   }
   
-  /* Съобщение при успех/грешка */
   .message {
     margin-top: 1rem;
     text-align: center;
     font-weight: bold;
-    color: #6b4f33;
-  }
-  
+    font-size: 1.2rem;
+}
+
   .success {
-    color: #2E7D32; /* Deep green */
+      color: #2E7D32; /* Green for success */
+      animation: fadeIn 1s ease-in-out;
   }
 
   .error {
-      color: #C62828; /* Deep red */
+      color: #C62828; /* Red for errors */
+  }
+
+  @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
   }

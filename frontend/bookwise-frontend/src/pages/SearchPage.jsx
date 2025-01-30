@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from "axios";
+import api from "./api";
 import { useNavigate } from "react-router-dom";
 
 const SearchPage = () => {
@@ -15,7 +15,7 @@ const SearchPage = () => {
         setError("");
 
         try {
-            const response = await axios.get("http://localhost:8080/books/search", {
+            const response = await api.get("/books/search", {
                 params: {
                     query,
                     maxResults: 12,

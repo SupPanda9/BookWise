@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import "../styles/Collections.css"; // Стилове за картите
+import api from "./api";
 
 const CollectionDetailsPage = () => {
     const { collectionId } = useParams();
@@ -9,25 +8,10 @@ const CollectionDetailsPage = () => {
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     const fetchCollectionDetails = async () => {
-    //         try {
-    //             const response = await axios.get(`http://localhost:8080/collections/${collectionId}`);
-    //             console.log("Collection response:", response.data);
-    //             setCollection(response.data);
-    //         } catch (err) {
-    //             console.error("Грешка при зареждане на детайли за колекцията:", err);
-    //             setError("Неуспешно зареждане на детайлите за колекцията.");
-    //         }
-    //     };
-
-    //     fetchCollectionDetails();
-    // }, [collectionId]);
-
     useEffect(() => {
         const fetchBooksInCollection = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/collections/${collectionId}/books/details`);
+                const response = await api.get(`/collections/${collectionId}/books/details`);
                 const booksWithId = response.data.map((book) => ({
                     id: book.googleBooksId, // Задаваме googleBooksId като id
                     ...book, // Запазваме останалите полета
@@ -47,7 +31,7 @@ const CollectionDetailsPage = () => {
         if (!window.confirm("Сигурни ли сте, че искате да премахнете тази книга от колекцията?")) return;
 
         try {
-            await axios.delete(`http://localhost:8080/collections/${collectionId}/books/${bookId}`);
+            await api.delete(`/collections/${collectionId}/books/${bookId}`);
             setCollection((prev) => ({
                 ...prev,
                 books: prev.books.filter((book) => book.id !== bookId),
@@ -60,7 +44,7 @@ const CollectionDetailsPage = () => {
 
     const togglePublic = async () => {
         try {
-            const response = await axios.put(`http://localhost:8080/collections/${collectionId}`, {
+            const response = await api.put(`/collections/${collectionId}`, {
                 ...collection,
                 isPublic: !collection.isPublic,
             });

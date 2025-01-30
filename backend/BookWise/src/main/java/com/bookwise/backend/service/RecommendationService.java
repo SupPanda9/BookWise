@@ -20,7 +20,7 @@ public class RecommendationService {
     private static final int THREAD_POOL_CORE_SIZE = 5;
     private static final int THREAD_POOL_MAX_SIZE = 10;
     private static final int THREAD_POOL_QUEUE_CAPACITY = 25;
-    private static final int TIMEOUT_SECONDS = 30;
+    private static final int TIMEOUT_SECONDS = 90;
     private static final int SLEEP_INTERVAL_MS = 100;
 
     private final Firestore db = FirestoreClient.getFirestore();
@@ -60,7 +60,7 @@ public class RecommendationService {
                 }
 
                 // Debug: Print received response
-                System.out.println("Received Response: " + response);
+//                System.out.println("Received Response: " + response);
 
                 rabbitMQConsumer.removeResponse(requestId); // Clean up
                 return response;

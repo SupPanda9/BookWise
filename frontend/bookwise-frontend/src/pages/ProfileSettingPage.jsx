@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "./api";
 
 const ProfileSettingsPage = () => {
     const [username, setUsername] = useState("");
@@ -17,7 +17,7 @@ const ProfileSettingsPage = () => {
             }
 
             try {
-                const response = await axios.get(`http://localhost:8080/users/${userId}`);
+                const response = await api.get(`/users/${userId}`);
                 setUsername(response.data.username || "");
                 setEmail(response.data.email || "");
                 setError("");
@@ -38,7 +38,7 @@ const ProfileSettingsPage = () => {
         }
 
         try {
-            await axios.put(`http://localhost:8080/users/${userId}/profile`, { [field]: value });
+            await api.put(`/users/${userId}/profile`, { [field]: value });
             setSuccessMessage(`Успешно актуализирано: ${field}`);
             setError("");
         } catch (err) {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
+import api from "./api";
 import styles from "../styles/BookDetails.module.css";
 import "../styles/Modal.css";
 import { useNavigate } from "react-router-dom";
@@ -37,16 +37,16 @@ const BookDetailsPage = () => {
             }   
 
             try {
-                const response = await axios.get(`http://localhost:8080/books/${googleBooksId}`, {
+                const response = await api.get(`/books/${googleBooksId}`, {
                     params: { userId },
                 });
                 setBook(response.data);
 
-                const userResponse = await axios.get(`http://localhost:8080/users/${userId}`);
+                const userResponse = await api.get(`/users/${userId}`);
                 setIsRead(userResponse.data.readBooks.includes(googleBooksId));
 
                 // Зареждане на ревюта
-                const reviewsResponse = await axios.get(`http://localhost:8080/reviews/${googleBooksId}`);
+                const reviewsResponse = await api.get(`/reviews/${googleBooksId}`);
                 const reviewsData = Object.values(reviewsResponse.data);
 
                 // Ако няма ревюта, показваме празно съобщение
@@ -78,13 +78,13 @@ const BookDetailsPage = () => {
         try {
             if (isRead) {
                 // Unmark book as read
-                await axios.delete(`http://localhost:8080/collections/users/${userId}/read`, {
+                await api.delete(`/collections/users/${userId}/read`, {
                     data: { bookId: googleBooksId },
                 });
                 setIsRead(false);
             } else {
                 // Mark book as read
-                await axios.post(`http://localhost:8080/collections/users/${userId}/read`, {
+                await api.post(`/collections/users/${userId}/read`, {
                     bookId: googleBooksId,
                 });
                 setIsRead(true);
@@ -103,7 +103,7 @@ const BookDetailsPage = () => {
         }
     
         try {
-            const response = await axios.post(`http://localhost:8080/reviews/${googleBooksId}`, {
+            const response = await api.post(`/reviews/${googleBooksId}`, {
                 text: newReview,
                 rating,
                 userId,
@@ -135,7 +135,7 @@ const BookDetailsPage = () => {
         }
     
         try {
-            await axios.delete(`http://localhost:8080/reviews/${googleBooksId}/${reviewId}`, {
+            await api.delete(`/reviews/${googleBooksId}/${reviewId}`, {
                 params: { userId: localStorage.getItem("userId") },
             });
     
@@ -156,7 +156,7 @@ const BookDetailsPage = () => {
 
     const submitEditReview = async () => {
         try {
-            await axios.put(`http://localhost:8080/reviews/${googleBooksId}/${editingReview}`, {
+            await api.put(`/reviews/${googleBooksId}/${editingReview}`, {
                 text: editedText,
                 rating: editedRating,
                 userId: localStorage.getItem("userId"),
@@ -210,7 +210,7 @@ const BookDetailsPage = () => {
             }
     
             try {
-                const response = await axios.get("http://localhost:8080/collections", {
+                const response = await api.get("/collections", {
                     params: { userId },
                 });
 
@@ -245,11 +245,11 @@ const BookDetailsPage = () => {
     const toggleCollection = async (collectionId, isSelected) => {
         try {
             if (isSelected) {
-                await axios.post(`http://localhost:8080/collections/${collectionId}/books`, {
+                await api.post(`/collections/${collectionId}/books`, {
                     bookId: googleBooksId,
                 });
             } else {
-                await axios.delete(`http://localhost:8080/collections/${collectionId}/books/${googleBooksId}`);
+                await api.delete(`/collections/${collectionId}/books/${googleBooksId}`);
             }
     
             // Обновяване на състоянието
@@ -293,7 +293,7 @@ const BookDetailsPage = () => {
         }
     
         try {
-            const response = await axios.post("http://localhost:8080/collections", {
+            const response = await api.post("/collections", {
                 userId,
                 name: newCollectionName.trim(),
                 isPublic: false,
@@ -363,7 +363,7 @@ const BookDetailsPage = () => {
                                         <h4>Create New Collection</h4>
                                         <input className="collection-input" type="text" value={newCollectionName} onChange={(e) => setNewCollectionName(e.target.value)} placeholder="Collection Name" />
                                         <div className="modal-buttons">
-                                            <button className="create-collection">Create</button>
+                                            <button className="create-collection" onClick={createCollection}>Create</button>
                                             <button className="close-modal" onClick={toggleModal}>Close</button>
                                         </div>
                                     </div>
