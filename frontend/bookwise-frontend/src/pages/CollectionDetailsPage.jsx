@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "./api";
+import styles from "../styles/CollectionDetails.module.css";
 
 const CollectionDetailsPage = () => {
     const { collectionId } = useParams();
@@ -9,26 +10,35 @@ const CollectionDetailsPage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchBooksInCollection = async () => {
+        const fetchCollectionDetails = async () => {
             try {
-                const response = await api.get(`/collections/${collectionId}/books/details`);
-                const booksWithId = response.data.map((book) => ({
-                    id: book.googleBooksId, // Задаваме googleBooksId като id
-                    ...book, // Запазваме останалите полета
+                // Първо зареждаме детайлите за колекцията
+                const collectionResponse = await api.get(`/collections/${collectionId}`);
+                const collectionData = collectionResponse.data;
+
+                // След това зареждаме книгите
+                const booksResponse = await api.get(`/collections/${collectionId}/books/details`);
+                const booksWithId = booksResponse.data.map((book) => ({
+                    id: book.googleBooksId,
+                    ...book,
                 }));
-                setCollection({ ...collection, books: booksWithId });
-                console.log("Fetched books from collection:", response.data);
+
+                // Комбинираме информацията
+                setCollection({ ...collectionData, books: booksWithId });
+
+                console.log("Fetched collection:", collectionData);
+                console.log("Fetched books from collection:", booksResponse.data);
             } catch (err) {
-                console.error("Грешка при зареждане на книгите в колекцията:", err);
-                setError("Неуспешно зареждане на книгите.");
+                console.error("Error fetching collection details:", err);
+                setError("Failed to load collection details.");
             }
         };
-    
-        fetchBooksInCollection();
-    }, [collectionId]);    
+
+        fetchCollectionDetails();
+    }, [collectionId]);
 
     const removeBook = async (bookId) => {
-        if (!window.confirm("Сигурни ли сте, че искате да премахнете тази книга от колекцията?")) return;
+        if (!window.confirm("Are you sure you want to remove this book from the collection?")) return;
 
         try {
             await api.delete(`/collections/${collectionId}/books/${bookId}`);
@@ -37,54 +47,45 @@ const CollectionDetailsPage = () => {
                 books: prev.books.filter((book) => book.id !== bookId),
             }));
         } catch (err) {
-            console.error("Грешка при премахване на книга:", err);
-            setError("Неуспешно премахване на книга.");
+            console.error("Error removing book:", err);
+            setError("Failed to remove book.");
         }
     };
 
-    const togglePublic = async () => {
-        try {
-            const response = await api.put(`/collections/${collectionId}`, {
-                ...collection,
-                isPublic: !collection.isPublic,
-            });
-            setCollection(response.data);
-        } catch (err) {
-            console.error("Грешка при промяна на публичността:", err);
-        }
-    };
-
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
-    if (!collection) return <p>Зареждане...</p>;
+    if (error) return <p className={styles.error}>{error}</p>;
+    if (!collection) return <p className={styles.loading}>Loading...</p>;
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h1>{collection.name}</h1>
-            <button onClick={togglePublic}>
-                Публична: {collection.isPublic ? "Да" : "Не"}
-            </button>
-            <div className="books-grid">
+        <div className={styles.pageWrapper}>
+            <header className={styles.header}>
+                <h2>{collection.name}</h2>
+                <button onClick={() => navigate("/collections")} className={styles.backButton}>
+                    Back
+                </button>
+            </header>
+
+            <div className={styles.bookGrid}>
                 {collection.books.map((book) => (
-                    <div key={book.id} className="book-card">
+                    <div key={book.id} className={styles.bookCard}>
                         <div
-                            className="book-content"
-                            onClick={() => navigate(`/books/${book.id}`)} // Пренасочване към детайлите
+                            className={styles.bookContent}
+                            onClick={() => navigate(`/books/${book.id}`)}
                         >
                             <img
                                 src={book.coverImage}
                                 alt={book.title}
-                                style={{ width: "150px", height: "200px", objectFit: "cover" }}
+                                className={styles.bookCover}
                             />
-                            <h3>{book.title}</h3>
+                            <h3 className={styles.bookTitle}>{book.title}</h3>
                         </div>
                         <button
                             onClick={(e) => {
-                                e.stopPropagation(); // Предотвратява отварянето на страницата на книгата
+                                e.stopPropagation();
                                 removeBook(book.id);
                             }}
-                            className="btn-danger"
+                            className={styles.deleteButton}
                         >
-                            Премахни
+                            Remove
                         </button>
                     </div>
                 ))}

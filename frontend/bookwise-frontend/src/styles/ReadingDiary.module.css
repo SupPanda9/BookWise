@@ -26,6 +26,35 @@
     border-radius: 15px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     color: white;
+    box-sizing: border-box;
+}
+
+.header h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  
+        #ffcc00 45%,  
+        #ffd700 50%,  
+        #ffcc00 55%,  
+        #a67c00 90%   
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shine 10s infinite linear;
+}
+
+@keyframes shine {
+    0% { background-position: 200% center; }
+    100% { background-position: -200% center; }
+}
+
+@keyframes shineHover {
+    0% { background-position: 100% center; }
+    100% { background-position: -100% center; }
 }
 
 /* 🔙 Back Button */
@@ -37,11 +66,30 @@
     border: none;
     cursor: pointer;
     padding: 10px 20px;
-    color: #FFD700;
+    position: relative;
+    transition: all 0.5s ease-in-out;
+    
+    /* Gold Shine Effect */
+    background-image: linear-gradient(
+        to right,
+        #a67c00 10%,  
+        #ffcc00 45%,  
+        #ffd700 50%,  
+        #ffcc00 55%,  
+        #a67c00 90%   
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shineHover 1s linear;
 }
 
 .backButton:hover {
-    text-decoration: underline;
+    animation: none; /* Stops ongoing animation */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transform: scale(1.1);
+    animation: shineHover 1s infinite linear;
 }
 
 /* 📚 Entry List */
@@ -59,6 +107,7 @@
     box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
     text-align: left;
     width: 100%;
+    box-sizing: border-box;
 }
 
 /* 📖 Book Info */
@@ -72,7 +121,7 @@
     width: 80px;
     height: 120px;
     object-fit: cover;
-    margin-right: 10px;
+    margin: 10px 10px 0 10px;
 }
 
 /* 📝 Notes Input */
@@ -92,20 +141,38 @@
     border-color: #FFD700;
 }
 
-/* ❌ Delete Button */
-.deleteButton {
-    background-color: #D9534F;
+.editButton {
+    padding: 10px 15px;
+    font-size: 15px;
+    background-color: #5C3D2E;
     color: white;
     border: none;
-    padding: 10px 15px;
-    border-radius: 5px;
-    font-weight: bold;
+    border-radius: 10px;
     cursor: pointer;
-    margin-top: 10px;
+    margin-left: 10px;
+    transition: background 0.3s ease-in-out;
+}
+
+.editButton:hover {
+    background-color: #FFD700;
+    color: #5C3D2E;
+}
+
+/* ❌ Delete Button */
+.deleteButton {
+    background-color: #dc3545;
+    padding: 10px 15px;
+    font-size: 15px;
+    margin-left: 10px;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
 }
 
 .deleteButton:hover {
-    background-color: #C9302C;
+    background-color: #a41422;
 }
 
 /* New */
@@ -131,6 +198,17 @@
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
+.modal textarea {
+    box-sizing: border-box;
+    height: 100px;
+}
+
+.modal h3 {
+    font-size: 1.5rem;
+    color: #5C3D2E;
+    margin-bottom: 10px;
+}
+
 .modalButtons {
     display: flex;
     justify-content: space-between;
@@ -152,4 +230,65 @@
 .cancelButton {
     background-color: gray;
     color: white;
+}
+
+.bookTitle {
+    cursor: pointer;
+    color: #5C3D2E;
+    font-size: 1.5rem;
+    margin-top: 0;
+    padding: 10px;
+}
+
+.entryCard p {
+    margin: 0;
+    padding: 10px;
+    color: #5C3D2E;
+}
+
+.bookTitle:hover {
+    color: #0056b3;
+}
+
+/* 📝 Notes Preview */
+.notesPreview {
+    word-wrap: break-word; /* Wraps long words */
+    overflow-wrap: break-word;
+    white-space: normal;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.notesPreview h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #5C3D2E;
+    padding: 10px;
+}
+
+.notesPreview p {
+    max-height: 4.5em; /* Ограничаваме до няколко реда */
+    overflow: hidden;
+}
+
+.notesPreview.expanded p {
+    max-height: none; /* Покажи всичко, когато Show More е натиснат */
+}
+
+/* 🔘 Show More Button */
+.showMoreButton {
+    background: none;
+    border: none;
+    color: #5C3D2E;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 10px;
+    box-sizing: border-box;
+    border: #5C3D2E 2px solid;
+    display: block; /* Уверяваме се, че бутонът винаги се показва */
+}
+
+.showMoreButton:hover {
+    text-decoration: underline;
+    border: #5C3D2E 2px solid;
 }

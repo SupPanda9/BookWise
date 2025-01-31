@@ -9,6 +9,7 @@ const ReadingDiaryPage = () => {
     const [diaryEntries, setDiaryEntries] = useState({}); // User notes
     const [selectedBook, setSelectedBook] = useState(null); // Book currently being edited
     const [tempNotes, setTempNotes] = useState(""); // Temporary text for editing
+    const [expandedNotes, setExpandedNotes] = useState({}); // Controls "Show More" state
     const navigate = useNavigate();
     const userId = localStorage.getItem("userId");
 
@@ -34,17 +35,22 @@ const ReadingDiaryPage = () => {
             const response = await api.get(`/readingDiary/${userId}`);
             const entries = response.data.entries || {}; 
     
-            // Map entries correctly by bookId
-            const mappedEntries = Object.values(entries).reduce((acc, entry) => {
-                acc[entry.bookId] = entry.notes;
-                return acc;
-            }, {});
+            console.log("Fetched diary entries:", entries); // Debugging
     
+            // Map notes by bookId, not entryId
+            const mappedEntries = {};
+            Object.values(entries).forEach(entry => {
+                if (entry.bookId) {
+                    mappedEntries[entry.bookId] = entry.notes;
+                }
+            });
+    
+            console.log("Mapped diary entries:", mappedEntries); // Debugging
             setDiaryEntries(mappedEntries);
         } catch (err) {
             console.error("Error fetching diary entries:", err);
         }
-    };    
+    };
 
     /** Open modal for editing a note */
     const openEditModal = (book) => {
@@ -77,9 +83,7 @@ const ReadingDiaryPage = () => {
         }
     };
 
-
     /** Remove book from diary (same as marking as unread) */
-    /** Remove book from diary and mark as unread */
     const toggleReadStatus = async (bookId) => {
         if (!window.confirm("Are you sure you want to remove this book from your diary?")) return;
 
@@ -104,6 +108,14 @@ const ReadingDiaryPage = () => {
         }
     };
 
+    /** Toggle "Show More" for notes */
+    const toggleExpandNotes = (bookId) => {
+        setExpandedNotes((prev) => ({
+            ...prev,
+            [bookId]: !prev[bookId],
+        }));
+    };
+
     return (
         <div className={styles.pageWrapper}>
             <header className={styles.header}>
@@ -117,26 +129,55 @@ const ReadingDiaryPage = () => {
                 {books.length === 0 ? (
                     <p>No books in your reading diary yet.</p>
                 ) : (
-                    books.map((book) => (
-                        <div key={book.googleBooksId} className={styles.entryCard}>
-                            <div className={styles.bookInfo}>
-                                <img src={book.coverImage} alt={book.title} className={styles.bookCover} />
-                                <div>
-                                    <h3>{book.title}</h3>
-                                    <p><strong>Author:</strong> {book.authors?.join(", ") || "Unknown"}</p>
+                    books.map((book) => {
+                        const notes = diaryEntries[book.googleBooksId] || "";
+                        const isExpanded = expandedNotes[book.googleBooksId] || false;
+                        const preview = notes.length > 300 ? notes.substring(0, 300) + "..." : notes;
+
+                        return (
+                            <div key={book.googleBooksId} className={styles.entryCard}>
+                                <div className={styles.bookInfo}>
+                                    <img
+                                        src={book.coverImage}
+                                        alt={book.title}
+                                        className={styles.bookCover}
+                                        onClick={() => navigate(`/books/${book.googleBooksId}`)}
+                                    />
+                                    <div>
+                                        <h3
+                                            className={styles.bookTitle}
+                                            onClick={() => navigate(`/books/${book.googleBooksId}`)}
+                                        >
+                                            {book.title}
+                                        </h3>
+                                        <p className={styles.author}><strong>Author:</strong> {book.authors?.join(", ") || "Unknown"}</p>
+                                    </div>
                                 </div>
+
+                                {/* Show Notes Preview */}
+                                {notes && (
+                                    <div className={`${styles.notesPreview} ${isExpanded ? styles.expanded : ""}`}>
+                                        <h4>Notes:</h4>
+                                        <p>{isExpanded ? notes : preview}</p>
+                                        {notes.length > 300 && (
+                                            <button onClick={() => toggleExpandNotes(book.googleBooksId)} className={styles.showMoreButton}>
+                                                {isExpanded ? "Show Less" : "Show More"}
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Buttons for Editing and Removing */}
+                                <button onClick={() => openEditModal(book)} className={styles.editButton}>
+                                    {notes ? "Edit Notes" : "Add Notes"}
+                                </button>
+
+                                <button onClick={() => toggleReadStatus(book.googleBooksId)} className={styles.deleteButton}>
+                                    Remove from Diary
+                                </button>
                             </div>
-
-                            {/* Show Notes Only When Clicking "Edit" */}
-                            <button onClick={() => openEditModal(book)} className={styles.editButton}>
-                                {diaryEntries[book.googleBooksId] ? "Edit Notes" : "Add Notes"}
-                            </button>
-
-                            <button onClick={() => toggleReadStatus(book.googleBooksId)} className={styles.deleteButton}>
-                                Remove from Diary
-                            </button>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
 

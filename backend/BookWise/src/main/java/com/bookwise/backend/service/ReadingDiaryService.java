@@ -79,7 +79,18 @@ public class ReadingDiaryService {
     }
 
     public Map<String, Object> getDiaryEntries(String userId) throws Exception {
-        return getOrCreateDiaryEntries(userId);
+        DocumentReference userRef = db.collection("readingDiary").document(userId);
+        ApiFuture<DocumentSnapshot> future = userRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            Map<String, Object> data = document.getData();
+            System.out.println("🔥 Fetched diary data: " + data); // Debug log
+            return data;
+        } else {
+            System.out.println("❌ No diary entries found for user: " + userId);
+            return new HashMap<>();
+        }
     }
 
     private Map<String, Object> getOrCreateDiaryEntries(String userId) throws Exception {

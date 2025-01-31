@@ -114,30 +114,34 @@ const CollectionsPage = () => {
             
             {/* Collections List */}
             <div className={styles.collectionsList}>
-                {collections.map((collection) => (
-                    <div key={collection.id} className={styles.collectionItem}>
-                        
-                        <span onClick={() => {
-                            if (collection.name === "Read") {
-                                navigate(`/reading-diary/${collection.id}`);
-                            } else {
-                                navigate(`/collections/${collection.id}`);
-                            }
-                        }}>{collection.name}</span>
+            {collections.map((collection) => (
+                <div 
+                    key={collection.id} 
+                    className={styles.collectionItem}
+                    onClick={() => {
+                        if (collection.name === "Read") {
+                            navigate(`/reading-diary/${collection.id}`);
+                        } else {
+                            navigate(`/collections/${collection.id}`);
+                        }
+                    }}
+                >
+                    <span>{collection.name}</span>
 
-                        {collection.name !== "Read" && (
-                            <button
-                                className={styles.deleteButton}
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    deleteCollection(collection.id, collection.name);
-                                }}>
-                                Delete
-                            </button>
-                        )}
-                    </div>
-                ))}
-            </div>
+                    {collection.name !== "Read" && (
+                        <button
+                            className={styles.deleteButton}
+                            onClick={(e) => {
+                                e.stopPropagation(); // Prevents the navigation when clicking delete
+                                deleteCollection(collection.id, collection.name);
+                            }}
+                        >
+                            Delete
+                        </button>
+                    )}
+                </div>
+            ))}
+        </div>
 
             {error && <p className={styles.errorText}>{error}</p>}
 
