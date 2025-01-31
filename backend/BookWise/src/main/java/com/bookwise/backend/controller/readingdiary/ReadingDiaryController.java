@@ -23,7 +23,7 @@ public class ReadingDiaryController {
     private ReadingDiaryService readingDiaryService;
 
     @PostMapping("/{userId}")
-    public ResponseEntity<?> addEntry(
+    public ResponseEntity<?> addOrUpdateEntry(
         @PathVariable String userId,
         @RequestBody Map<String, Object> request) {
         try {
@@ -31,9 +31,8 @@ public class ReadingDiaryController {
             String notes = (String) request.get("notes");
             Boolean isPublic = (Boolean) request.get("isPublic");
 
-            readingDiaryService.addEntry(userId, bookId, notes, isPublic != null && isPublic);
-
-            return ResponseEntity.ok("Diary entry added successfully.");
+            readingDiaryService.addOrUpdateEntry(userId, bookId, notes, isPublic != null && isPublic);
+            return ResponseEntity.ok("Diary entry updated successfully.");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());

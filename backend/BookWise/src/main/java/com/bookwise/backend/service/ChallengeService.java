@@ -9,6 +9,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -44,12 +47,18 @@ public class ChallengeService {
         }
 
         Challenge challenge = doc.toObject(Challenge.class);
-        if (challenge.getParticipants().containsKey(userId)) {
-            throw new RuntimeException("User already joined the challenge");
+
+        // If user already joined, do nothing
+        if (challenge.getParticipants() != null && challenge.getParticipants().containsKey(userId)) {
+            return;
         }
 
         Challenge.Participant participant = new Challenge.Participant();
         participant.setProgress(0);
+
+        if (challenge.getParticipants() == null) {
+            challenge.setParticipants(new HashMap<>());
+        }
 
         challenge.getParticipants().put(userId, participant);
         db.collection("challenges").document(challengeId).set(challenge).get();
@@ -62,12 +71,15 @@ public class ChallengeService {
         }
 
         Challenge challenge = doc.toObject(Challenge.class);
-        Challenge.Participant participant = challenge.getParticipants().get(userId);
-        if (participant == null) {
-            throw new RuntimeException("User not part of the challenge");
+
+        if (challenge.getParticipants() == null || !challenge.getParticipants().containsKey(userId)) {
+            throw new RuntimeException("User has not joined the challenge");
         }
 
+        Challenge.Participant participant = challenge.getParticipants().get(userId);
         participant.setProgress(participant.getProgress() + progress);
+
+        challenge.getParticipants().put(userId, participant);
         db.collection("challenges").document(challengeId).set(challenge).get();
     }
 
@@ -82,5 +94,15 @@ public class ChallengeService {
         } catch (ParseException e) {
             throw new RuntimeException("Invalid date format. Use: 'MMMM d, yyyy 'at' h:mm:ss a z'");
         }
+    }
+
+    public List<Challenge> getAllChallenges() throws ExecutionException, InterruptedException {
+        List<Challenge> challenges = new ArrayList<>();
+        var docs = db.collection("challenges").get().get();
+
+        for (var doc : docs.getDocuments()) {
+            challenges.add(doc.toObject(Challenge.class));
+        }
+        return challenges;
     }
 }

@@ -1,6 +1,9 @@
 package com.bookwise.backend.service;
 
 import com.bookwise.backend.model.ReadingDiaryEntry;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.DocumentReference;
+import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.Firestore;
 import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
@@ -106,4 +109,53 @@ public class ReadingDiaryService {
         return entry;
     }
 
+    public void addOrUpdateEntry(String userId, String bookId, String notes, boolean isPublic) throws Exception {
+        DocumentReference userRef = db.collection("readingDiary").document(userId);
+        ApiFuture<DocumentSnapshot> future = userRef.get();
+        DocumentSnapshot document = future.get();
+
+        if (document.exists()) {
+            Map<String, Object> data = document.getData();
+            Map<String, Object> entries = (Map<String, Object>) data.get("entries");
+
+            if (entries == null) {
+                entries = new HashMap<>();
+            }
+
+            if (entries.containsKey(bookId)) {
+                // Update existing entry
+                Map<String, Object> entry = (Map<String, Object>) entries.get(bookId);
+                entry.put("notes", notes);
+                entry.put("public", isPublic);
+            } else {
+                // Create new entry
+                Map<String, Object> newEntry = new HashMap<>();
+                newEntry.put("id", UUID.randomUUID().toString());
+                newEntry.put("bookId", bookId);
+                newEntry.put("notes", notes);
+                newEntry.put("public", isPublic);
+                newEntry.put("timestamp", Instant.now().toString());
+
+                entries.put(bookId, newEntry);
+            }
+
+            userRef.update("entries", entries).get();
+        } else {
+            // Create new document
+            Map<String, Object> entries = new HashMap<>();
+            Map<String, Object> newEntry = new HashMap<>();
+            newEntry.put("id", UUID.randomUUID().toString());
+            newEntry.put("bookId", bookId);
+            newEntry.put("notes", notes);
+            newEntry.put("public", isPublic);
+            newEntry.put("timestamp", Instant.now().toString());
+
+            entries.put(bookId, newEntry);
+
+            Map<String, Object> diaryData = new HashMap<>();
+            diaryData.put("entries", entries);
+
+            userRef.set(diaryData).get();
+        }
+    }
 }

@@ -85,7 +85,7 @@ const Dashboard = () => {
                     <button onClick={() => navigate("/recommendations")}>Recommendations</button>
                     <button onClick={() => navigate("/collections")}>Collections</button>
                     <button onClick={() => navigate("/profile")}>Profile</button>
-                    <button onClick={() => navigate("/challenges")}>Challenges</button>
+                    {/* <button onClick={() => navigate("/challenges")}>Challenges</button> */}
                     <button onClick={handleLogout} className={styles.logoutButton}>Logout</button>
                 </div>
             </nav>

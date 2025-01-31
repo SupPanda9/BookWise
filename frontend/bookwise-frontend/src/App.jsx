@@ -3,13 +3,14 @@ import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-route
 import HomePage from "./pages/HomePage";
 import RegistrationPage from "./pages/RegistrationPage";
 import Dashboard from "./pages/Dashboard";
-import SearchPage from "./pages/SearchPage";
 import BookDetailsPage from "./pages/BookDetailsPage";
 import CollectionsPage from "./pages/CollectionsPage";
 import CollectionDetailsPage from "./pages/CollectionDetailsPage";
 import ProfileSettingsPage from "./pages/ProfileSettingPage";
 import EmailConfirmationPage from "./pages/EmailConfirmationPage";
 import Recommendations from "./pages/Recommendations";
+import ChallengesPage from "./pages/ChallengesPage";
+import ReadingDiaryPage from "./pages/ReadingDiaryPage";
 import "../src/config/firebaseConfig";
 import { jwtDecode } from "jwt-decode";
 
@@ -68,11 +69,11 @@ function App() {
                     <Route path="/collections" element={<CollectionsPage />} />
                     <Route path="/collections/:collectionId" element={<CollectionDetailsPage />} />
                     <Route path="/profile" element={<ProfileSettingsPage />} />
-                    <Route path="/challenges" element={<h1>Предизвикателства</h1>} />
-                    <Route path="/search" element={<SearchPage />} />
+                    <Route path="/challenges" element={<ChallengesPage/>} />
                     <Route path="/books/:googleBooksId" element={<BookDetailsPage />} />
                     <Route path="/confirm-email" element={<EmailConfirmationPage />} />
                     <Route path="/recommendations" element={<Recommendations />} />
+                    <Route path="/reading-diary/:collectionId" element={<ReadingDiaryPage />} />
                 </Routes>
             </AuthWrapper>
         </Router>

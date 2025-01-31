@@ -25,6 +25,15 @@ public class ChallengeController {
         this.challengeService = challengeService;
     }
 
+    @GetMapping
+    public ResponseEntity<?> getAllChallenges() {
+        try {
+            return ResponseEntity.ok(challengeService.getAllChallenges());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to fetch challenges: " + e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<Challenge> createChallenge(@RequestBody Challenge challenge) {
         try {

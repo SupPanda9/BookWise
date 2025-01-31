@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "./api";
+import styles from "../styles/ProfileSettings.module.css"; // Import the CSS file
 
 const ProfileSettingsPage = () => {
+    const navigate = useNavigate(); // Navigation hook
+
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -48,83 +52,79 @@ const ProfileSettingsPage = () => {
     };
 
     const validateEmail = (email) => /\S+@\S+\.\S+/.test(email);
-
     const validatePassword = (password) => password.length >= 8;
 
     return (
-        <div style={{ padding: "20px" }}>
-            <h1>Настройки на профила</h1>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
-            <div>
-                <label>Потребителско име:</label>
+        <div className={styles.pageWrapper}>
+            {/* Brown Box Header with Gold Animation */}
+            <header className={styles.header}>
+                <h2>Profile Settings</h2>
+                <button onClick={() => navigate("/dashboard")} className={styles.backButton}>
+                    Back
+                </button>
+            </header>
+
+            {error && <p className={`${styles.message} ${styles.error}`}>{error}</p>}
+            {successMessage && <p className={`${styles.message} ${styles.success}`}>{successMessage}</p>}
+
+            <div className={styles.fieldWrapper}>
+                <label className={styles.label}>Username:</label>
                 <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    style={{ padding: "10px", margin: "10px 0", display: "block" }}
+                    className={styles.input}
                 />
-                <button
-                    onClick={() => updateField("username", username)}
-                    style={buttonStyle}
-                >
-                    Актуализирай потребителското име
+                <button onClick={() => updateField("username", username)} className={styles.button}>
+                    Change Username
                 </button>
             </div>
-            <div>
-                <label>Имейл:</label>
+
+            <div className={styles.fieldWrapper}>
+                <label className={styles.label}>Email:</label>
                 <input
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    style={{ padding: "10px", margin: "10px 0", display: "block" }}
+                    className={styles.input}
                 />
                 <button
                     onClick={() => {
                         if (validateEmail(email)) {
                             updateField("email", email);
                         } else {
-                            setError("Моля, въведете валиден имейл.");
+                            setError("Enter valid email.");
                         }
                     }}
-                    style={buttonStyle}
+                    className={styles.button}
                 >
-                    Актуализирай имейла
+                    Change Email
                 </button>
             </div>
-            <div>
-                <label>Парола:</label>
+
+            <div className={styles.fieldWrapper}>
+                <label className={styles.label}>Password:</label>
                 <input
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    style={{ padding: "10px", margin: "10px 0", display: "block" }}
+                    className={styles.input}
                 />
                 <button
                     onClick={() => {
                         if (validatePassword(password)) {
                             updateField("password", password);
                         } else {
-                            setError("Паролата трябва да бъде поне 8 символа.");
+                            setError("Password must be at least 8 characters.");
                         }
                     }}
-                    style={buttonStyle}
+                    className={styles.button}
                 >
-                    Актуализирай паролата
+                    Change Password
                 </button>
             </div>
         </div>
     );
-};
-
-const buttonStyle = {
-    padding: "10px 20px",
-    backgroundColor: "#007BFF",
-    color: "#fff",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    marginTop: "10px",
 };
 
 export default ProfileSettingsPage;

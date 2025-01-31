@@ -116,7 +116,15 @@ const CollectionsPage = () => {
             <div className={styles.collectionsList}>
                 {collections.map((collection) => (
                     <div key={collection.id} className={styles.collectionItem}>
-                        <span onClick={() => navigate(`/collections/${collection.id}`)}>{collection.name}</span>
+                        
+                        <span onClick={() => {
+                            if (collection.name === "Read") {
+                                navigate(`/reading-diary/${collection.id}`);
+                            } else {
+                                navigate(`/collections/${collection.id}`);
+                            }
+                        }}>{collection.name}</span>
+
                         {collection.name !== "Read" && (
                             <button
                                 className={styles.deleteButton}
