@@ -26,6 +26,19 @@ const Recommendations = () => {
             return;
         }
 
+        const wordCount = query.trim().split(/\s+/).length;
+        if (wordCount < 4) {
+            setError("Please, enter at least 4 words in the query field!");
+            return;
+        }
+
+        // Валидация на жанровете
+        const genreArray = genres.split(",").map((genre) => genre.trim());
+        if (genres && genreArray.some((genre) => genre === "")) {
+            setError("Please, separate genres with commas without additional spaces.");
+            return;
+        }
+
         setLoading(true); // Show loading spinner
         setError("");
 

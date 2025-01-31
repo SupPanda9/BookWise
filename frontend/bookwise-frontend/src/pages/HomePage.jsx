@@ -52,7 +52,7 @@ const HomePage = () => {
                         <input
                             type="email"
                             name="email"
-                            placeholder="Имейл"
+                            placeholder="Email"
                             onChange={handleChange}
                             value={formData.email}
                             required
@@ -62,7 +62,7 @@ const HomePage = () => {
                         <input
                             type="password"
                             name="password"
-                            placeholder="Парола"
+                            placeholder="Password"
                             onChange={handleChange}
                             value={formData.password}
                             required
