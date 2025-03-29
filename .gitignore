@@ -24,3 +24,6 @@ hs_err_pid*
 replay_pid*
 
 backend/BookWise/src/main/resources/firebaseServiceKey.json
+application.properties
+.env
+firebaseConfig.js
